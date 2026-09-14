@@ -10,11 +10,8 @@
             --sidebar-bg: #181818;
             --card-bg: #1f1f1f;
             --text-color: #f3f3f3;
-            --text-secondary: #adadad;
-            --accent-color: #0078d4; /* Fluent Blue */
-            --accent-hover: #106ebe;
+            --accent-color: #0078d4;
             --border-color: #2b2b2b;
-            --win-border: #383838;
         }
 
         @media (prefers-color-scheme: light) {
@@ -23,18 +20,15 @@
                 --sidebar-bg: #e7e7e7;
                 --card-bg: #ffffff;
                 --text-color: #1b1b1b;
-                --text-secondary: #5d5d5d;
                 --accent-color: #0078d4;
-                --accent-hover: #005a9e;
                 --border-color: #e0e0e0;
-                --win-border: #cccccc;
             }
         }
 
         * { box-sizing: border-box; }
 
         body {
-            font-family: "Segoe UI Variable Text", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            font-family: "Segoe UI Variable Text", "Segoe UI", -apple-system, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
@@ -44,7 +38,6 @@
             overflow: hidden;
         }
 
-        /* Estructura Principal estilo WPF App */
         .app-window {
             display: flex;
             width: 100vw;
@@ -52,7 +45,7 @@
             background-color: var(--bg-color);
         }
 
-        /* Barra Lateral (Sidebar tipo MS Store) */
+        /* Sidebar por defecto (Pantallas grandes) */
         .sidebar {
             width: 70px;
             background-color: var(--sidebar-bg);
@@ -62,26 +55,25 @@
             align-items: center;
             padding-top: 15px;
             gap: 10px;
-            z-index: 10;
+            z-index: 100;
+            flex-shrink: 0;
         }
 
         .nav-item {
-            width: 50px;
-            height: 50px;
+            width: 48px;
+            height: 48px;
             border-radius: 8px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             cursor: pointer;
             transition: all 0.2s ease;
             position: relative;
             color: var(--text-color);
         }
 
-        .nav-item:hover {
-            background-color: rgba(255, 255, 255, 0.08);
-        }
+        .nav-item:hover { background-color: rgba(255, 255, 255, 0.08); }
 
         .nav-item.active {
             background-color: rgba(0, 120, 212, 0.15);
@@ -98,65 +90,37 @@
             border-radius: 0 4px 4px 0;
         }
 
-        .nav-item-bottom {
-            margin-top: auto;
-            margin-bottom: 15px;
-        }
+        .nav-item-bottom { margin-top: auto; margin-bottom: 15px; }
 
-        /* Área de Contenido Principal */
+        /* Contenido principal */
         .main-content {
             flex: 1;
             display: flex;
             flex-direction: column;
             overflow-y: auto;
+            padding-bottom: 70px; /* Margen para no tapar contenido en celular */
         }
 
-        /* Banner Superior */
         .top-banner {
             background: linear-gradient(135deg, var(--accent-color), #004578);
             color: white;
-            padding: 20px 30px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
+            padding: 16px 20px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
 
-        .top-banner h1 {
-            margin: 0;
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
+        .top-banner h1 { margin: 0; font-size: 1.4rem; font-weight: 600; }
+        .top-banner p { margin: 0; font-size: 0.8rem; opacity: 0.9; }
 
-        .top-banner p {
-            margin: 0;
-            font-size: 0.85rem;
-            opacity: 0.9;
-        }
-
-        /* Contenedor dinámico de páginas */
         .container {
-            padding: 25px;
+            padding: 20px;
             max-width: 800px;
             margin: 0 auto;
             width: 100%;
         }
 
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Tarjetas estilo Fluent */
         .card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -176,7 +140,7 @@
             font-weight: bold;
         }
 
-        /* Estilos del Minijuego */
+        /* Estilos del Tres en Raya */
         .board {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -206,27 +170,46 @@
             background-color: var(--accent-color);
             color: white;
             border: none;
-            padding: 8px 16px;
+            padding: 10px 18px;
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
         }
 
-        /* Mobile Adaptability */
-        @media (max-width: 600px) {
-            .app-window { flex-direction: column-reverse; }
+        /* Ícono SVG de Windows 11 */
+        .win11-icon {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        /* Adaptación Móvil Garantizada */
+        @media (max-width: 768px) {
+            .app-window { flex-direction: column; }
+            
+            .main-content { padding-bottom: 80px; }
+
             .sidebar {
-                width: 100%;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100vw;
                 height: 60px;
                 flex-direction: row;
                 justify-content: space-around;
                 padding-top: 0;
                 border-right: none;
                 border-top: 1px solid var(--border-color);
+                background-color: var(--sidebar-bg);
             }
+
             .nav-item-bottom { margin-top: 0; margin-bottom: 0; }
+            
             .nav-item.active::before {
-                left: auto; bottom: 0; width: 24px; height: 4px;
+                left: auto;
+                bottom: 0;
+                width: 24px;
+                height: 4px;
                 border-radius: 4px 4px 0 0;
             }
         }
@@ -235,26 +218,27 @@
 <body>
 
     <div class="app-window">
-        <!-- Sidebar tipo MS Store -->
+        <!-- Sidebar Móvil y Escritorio -->
         <div class="sidebar">
-            <div class="nav-item active" onclick="switchTab('triton')" title="Proyecto Tritón">🔱</div>
-            <div class="nav-item" onclick="switchTab('games')" title="Minijuegos">🎮</div>
-            <div class="nav-item" onclick="switchTab('windows')" title="Proyectos Windows">🪟</div>
-            <div class="nav-item" onclick="switchTab('news')" title="Novedades">📰</div>
-            <div class="nav-item nav-item-bottom" onclick="switchTab('about')" title="Acerca de">ℹ️</div>
+            <div class="nav-item active" onclick="switchTab('triton', this)" title="Proyecto Tritón">🔱</div>
+            <div class="nav-item" onclick="switchTab('games', this)" title="Minijuegos">🎮</div>
+            <!-- Ícono de Windows 11 oficial -->
+            <div class="nav-item" onclick="switchTab('windows', this)" title="Proyectos Windows">
+                <svg class="win11-icon" viewBox="0 0 88 88" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 0h41.6v41.6H0zM46.4 0H88v41.6H46.4zM0 46.4h41.6V88H0zM46.4 46.4H88V88H46.4z"/>
+                </svg>
+            </div>
+            <div class="nav-item" onclick="switchTab('news', this)" title="Novedades">📰</div>
+            <div class="nav-item nav-item-bottom" onclick="switchTab('about', this)" title="Acerca de">ℹ️</div>
         </div>
 
-        <!-- Área Principal -->
         <div class="main-content">
             <div class="top-banner">
-                <div>
-                    <h1>AnubiSoft</h1>
-                    <p>Desarrollo & Preservación Retro | Official Hub</p>
-                </div>
+                <h1>AnubiSoft</h1>
+                <p>Desarrollo & Preservación Retro | Official Hub</p>
             </div>
 
             <div class="container">
-                <!-- Pestaña 1: Tritón -->
                 <div id="triton" class="tab-content active">
                     <div class="card">
                         <span class="badge">🏗️ En Desarrollo Activo</span>
@@ -264,7 +248,6 @@
                     </div>
                 </div>
 
-                <!-- Pestaña 2: Juegos -->
                 <div id="games" class="tab-content">
                     <div class="card" style="text-align: center;">
                         <h2>WLM Retro Mini-Game 🎮</h2>
@@ -284,7 +267,6 @@
                     </div>
                 </div>
 
-                <!-- Pestaña 3: Proyectos Windows -->
                 <div id="windows" class="tab-content">
                     <div class="card">
                         <h2>Proyectos Windows 🪟</h2>
@@ -292,7 +274,6 @@
                     </div>
                 </div>
 
-                <!-- Pestaña 4: Novedades / Galería -->
                 <div id="news" class="tab-content">
                     <div class="card">
                         <h2>Boletín Informativo 📰</h2>
@@ -300,7 +281,6 @@
                     </div>
                 </div>
 
-                <!-- Pestaña 5: Acerca de -->
                 <div id="about" class="tab-content">
                     <div class="card">
                         <h2>Acerca de AnubiSoft ℹ️</h2>
@@ -316,16 +296,14 @@
     </div>
 
     <script>
-        // Navegación de Pestañas
-        function switchTab(tabId) {
+        function switchTab(tabId, element) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             
             document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
+            element.classList.add('active');
         }
 
-        // Lógica del Tres en Raya
         let board = ['', '', '', '', '', '', '', '', ''];
         let turn = 'X';
         let active = true;
