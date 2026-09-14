@@ -3,54 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AnubiSoft - Tritón</title>
+    <title>AnubiSoft - Portal Oficial</title>
     <style>
-        /* Variables para Modo Claro por defecto */
         :root {
-            --bg-color: #f4f4f9;
-            --text-color: #1a1a1a;
-            --card-bg: #ffffff;
-            --accent-color: #0078d7; /* Azul clásico guiño a MSN */
-            --border-color: #dddddd;
+            --bg-color: #121212;
+            --sidebar-bg: #181818;
+            --card-bg: #1f1f1f;
+            --text-color: #f3f3f3;
+            --text-secondary: #adadad;
+            --accent-color: #0078d4; /* Fluent Blue */
+            --accent-hover: #106ebe;
+            --border-color: #2b2b2b;
+            --win-border: #383838;
         }
 
-        /* Detección automática de Modo Oscuro del sistema */
-        @media (prefers-color-scheme: dark) {
+        @media (prefers-color-scheme: light) {
             :root {
-                --bg-color: #121212;
-                --text-color: #e0e0e0;
-                --card-bg: #1e1e1e;
-                --accent-color: #00a4ef;
-                --border-color: #333333;
+                --bg-color: #f3f3f3;
+                --sidebar-bg: #e7e7e7;
+                --card-bg: #ffffff;
+                --text-color: #1b1b1b;
+                --text-secondary: #5d5d5d;
+                --accent-color: #0078d4;
+                --accent-hover: #005a9e;
+                --border-color: #e0e0e0;
+                --win-border: #cccccc;
             }
         }
 
+        * { box-sizing: border-box; }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: "Segoe UI Variable Text", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Estructura Principal estilo WPF App */
+        .app-window {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-color);
+        }
+
+        /* Barra Lateral (Sidebar tipo MS Store) */
+        .sidebar {
+            width: 70px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 15px;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .nav-item {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 90vh;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            color: var(--text-color);
         }
 
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-item.active {
+            background-color: rgba(0, 120, 212, 0.15);
+            color: var(--accent-color);
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 4px;
+            height: 24px;
+            background-color: var(--accent-color);
+            border-radius: 0 4px 4px 0;
+        }
+
+        .nav-item-bottom {
+            margin-top: auto;
+            margin-bottom: 15px;
+        }
+
+        /* Área de Contenido Principal */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        /* Banner Superior */
+        .top-banner {
+            background: linear-gradient(135deg, var(--accent-color), #004578);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .top-banner h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .top-banner p {
+            margin: 0;
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        /* Contenedor dinámico de páginas */
         .container {
-            max-width: 600px;
+            padding: 25px;
+            max-width: 800px;
+            margin: 0 auto;
             width: 100%;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Tarjetas estilo Fluent */
+        .card {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        h1 {
-            color: var(--accent-color);
-            margin-bottom: 10px;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
         }
 
         .badge {
@@ -58,39 +171,196 @@
             background-color: var(--accent-color);
             color: white;
             padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-
-        p {
-            line-height: 1.6;
-        }
-
-        .footer {
-            margin-top: 30px;
+            border-radius: 12px;
             font-size: 0.8rem;
-            opacity: 0.7;
+            font-weight: bold;
+        }
+
+        /* Estilos del Minijuego */
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            max-width: 270px;
+            margin: 15px auto;
+        }
+
+        .cell {
+            width: 80px;
+            height: 80px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 2rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .cell.x { color: #e74c3c; }
+        .cell.o { color: #3498db; }
+
+        .btn-reset {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* Mobile Adaptability */
+        @media (max-width: 600px) {
+            .app-window { flex-direction: column-reverse; }
+            .sidebar {
+                width: 100%;
+                height: 60px;
+                flex-direction: row;
+                justify-content: space-around;
+                padding-top: 0;
+                border-right: none;
+                border-top: 1px solid var(--border-color);
+            }
+            .nav-item-bottom { margin-top: 0; margin-bottom: 0; }
+            .nav-item.active::before {
+                left: auto; bottom: 0; width: 24px; height: 4px;
+                border-radius: 4px 4px 0 0;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>AnubiSoft</h1>
-        <div class="badge">🏗️ Sitio en Construcción</div>
-        
-        <h2>Proyecto Tritón 🔱</h2>
-        <p>Estamos preparando la plataforma oficial de <strong>Tritón</strong>, el nuevo cliente de mensajería para Android integrado con el servicio Escargot.</p>
-        
-        <p>Próximamente: guías de registro, novedades, descargas de APK y creador de skins.</p>
+    <div class="app-window">
+        <!-- Sidebar tipo MS Store -->
+        <div class="sidebar">
+            <div class="nav-item active" onclick="switchTab('triton')" title="Proyecto Tritón">🔱</div>
+            <div class="nav-item" onclick="switchTab('games')" title="Minijuegos">🎮</div>
+            <div class="nav-item" onclick="switchTab('windows')" title="Proyectos Windows">🪟</div>
+            <div class="nav-item" onclick="switchTab('news')" title="Novedades">📰</div>
+            <div class="nav-item nav-item-bottom" onclick="switchTab('about')" title="Acerca de">ℹ️</div>
+        </div>
 
-        <div class="footer">
-            &copy; 2026 AnubiSoft. Todos los derechos reservados.<br>
-            Alojado con orgullo en GitHub Pages.
+        <!-- Área Principal -->
+        <div class="main-content">
+            <div class="top-banner">
+                <div>
+                    <h1>AnubiSoft</h1>
+                    <p>Desarrollo & Preservación Retro | Official Hub</p>
+                </div>
+            </div>
+
+            <div class="container">
+                <!-- Pestaña 1: Tritón -->
+                <div id="triton" class="tab-content active">
+                    <div class="card">
+                        <span class="badge">🏗️ En Desarrollo Activo</span>
+                        <h2>Proyecto Tritón 🔱</h2>
+                        <p>Plataforma y cliente nativo de mensajería para Android, integrado con los servidores de <strong>Escargot</strong> para revivir la experiencia del clásico Windows Live Messenger.</p>
+                        <p>Próximamente publicaremos las APKs de prueba, guías de registro y soporte para cifrado E2EE.</p>
+                    </div>
+                </div>
+
+                <!-- Pestaña 2: Juegos -->
+                <div id="games" class="tab-content">
+                    <div class="card" style="text-align: center;">
+                        <h2>WLM Retro Mini-Game 🎮</h2>
+                        <p id="game-status">Turno de: Jugador X</p>
+                        <div class="board">
+                            <div class="cell" onclick="makeMove(0)"></div>
+                            <div class="cell" onclick="makeMove(1)"></div>
+                            <div class="cell" onclick="makeMove(2)"></div>
+                            <div class="cell" onclick="makeMove(3)"></div>
+                            <div class="cell" onclick="makeMove(4)"></div>
+                            <div class="cell" onclick="makeMove(5)"></div>
+                            <div class="cell" onclick="makeMove(6)"></div>
+                            <div class="cell" onclick="makeMove(7)"></div>
+                            <div class="cell" onclick="makeMove(8)"></div>
+                        </div>
+                        <button class="btn-reset" onclick="resetGame()">Reiniciar Partida</button>
+                    </div>
+                </div>
+
+                <!-- Pestaña 3: Proyectos Windows -->
+                <div id="windows" class="tab-content">
+                    <div class="card">
+                        <h2>Proyectos Windows 🪟</h2>
+                        <p>Espacio dedicado a herramientas de preservación, parches para juegos clásicos de Windows 7/XP y módulos para revivir funciones del sistema operativo en entornos modernos.</p>
+                    </div>
+                </div>
+
+                <!-- Pestaña 4: Novedades / Galería -->
+                <div id="news" class="tab-content">
+                    <div class="card">
+                        <h2>Boletín Informativo 📰</h2>
+                        <p>Capturas de pantalla, avances de UI en Kotlin e hitos del proyecto serán publicados aquí periódicamente.</p>
+                    </div>
+                </div>
+
+                <!-- Pestaña 5: Acerca de -->
+                <div id="about" class="tab-content">
+                    <div class="card">
+                        <h2>Acerca de AnubiSoft ℹ️</h2>
+                        <p>Somos un equipo apasionado por la programación, el software libre y la preservación de la nostalgia digital.</p>
+                        <p>Colaboramos activamente con la comunidad para hacer crecer proyectos como <strong>Escargot</strong>.</p>
+                        <p style="font-size: 0.85rem; opacity: 0.8; margin-top: 20px;">
+                            &copy; 2026 AnubiSoft. Alojado con orgullo en GitHub Pages.
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
+    <script>
+        // Navegación de Pestañas
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // Lógica del Tres en Raya
+        let board = ['', '', '', '', '', '', '', '', ''];
+        let turn = 'X';
+        let active = true;
+
+        function makeMove(i) {
+            if (board[i] !== '' || !active) return;
+            board[i] = turn;
+            const cells = document.querySelectorAll('.cell');
+            cells[i].innerText = turn;
+            cells[i].classList.add(turn.toLowerCase());
+            
+            if (checkWin()) {
+                document.getElementById('game-status').innerText = `¡Gana el Jugador ${turn}! 🎉`;
+                active = false;
+            } else if (!board.includes('')) {
+                document.getElementById('game-status').innerText = '¡Empate!';
+                active = false;
+            } else {
+                turn = turn === 'X' ? 'O' : 'X';
+                document.getElementById('game-status').innerText = `Turno de: Jugador ${turn}`;
+            }
+        }
+
+        function checkWin() {
+            const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+            return wins.some(w => board[w[0]] && board[w[0]] === board[w[1]] && board[w[0]] === board[w[2]]);
+        }
+
+        function resetGame() {
+            board = ['', '', '', '', '', '', '', '', ''];
+            turn = 'X';
+            active = true;
+            document.getElementById('game-status').innerText = 'Turno de: Jugador X';
+            document.querySelectorAll('.cell').forEach(c => { c.innerText = ''; c.classList.remove('x','o'); });
+        }
+    </script>
 </body>
 </html>
