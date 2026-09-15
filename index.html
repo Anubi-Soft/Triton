@@ -38,16 +38,19 @@
             overflow: hidden;
         }
 
-        .app-window {
-            display: flex;
-            width: 100vw;
-            height: 100vh;
-            background-color: var(--bg-color);
-        }
+        app-window {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--bg-color);
+    overflow: hidden;
+    position: relative;
+}
 
-        /* Sidebar por defecto (Pantallas grandes) */
-        .sidebar {
+        /* Sidebar para Escritorio/Horizontal */
+.sidebar {
     width: 70px;
+    height: 100vh;
     background-color: var(--sidebar-bg);
     border-right: 1px solid var(--border-color);
     display: flex;
@@ -57,8 +60,9 @@
     gap: 10px;
     z-index: 100;
     flex-shrink: 0;
-    height: 100%; /* Asegura que mantenga el alto sin desplazarse */
-        }
+    position: relative;
+    top: 0;
+}
         
 
         .nav-item {
