@@ -98,7 +98,7 @@
             display: flex;
             flex-direction: column;
             overflow-y: auto;
-            padding-bottom: 70px; /* Margen para no tapar contenido en celular */
+            padding-bottom: 70px;
         }
 
         .top-banner {
@@ -222,7 +222,6 @@
         <div class="sidebar">
             <div class="nav-item active" onclick="switchTab('triton', this)" title="Proyecto Tritón">🔱</div>
             <div class="nav-item" onclick="switchTab('games', this)" title="Minijuegos">🎮</div>
-            <!-- Ícono de Windows 11 oficial -->
             <div class="nav-item" onclick="switchTab('windows', this)" title="Proyectos Windows">
                 <svg class="win11-icon" viewBox="0 0 88 88" xmlns="http://www.w3.org/2000/svg">
                     <path d="M0 0h41.6v41.6H0zM46.4 0H88v41.6H46.4zM0 46.4h41.6V88H0zM46.4 46.4H88V88H46.4z"/>
@@ -248,54 +247,48 @@
                     </div>
                 </div>
 
-    <!-- Pestaña de Juegos -->
-<div id="games" class="tab-content">
-    <div class="card" style="text-align: center;">
-        <h2>WLM Retro Mini-Game 🎮</h2>
-        
-        <!-- Selectores estilo Metro/Windows -->
-        <div style="margin-bottom: 15px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-            <div>
-                <label for="game-mode" style="font-size: 0.85rem;">Modo: </label>
-                <select id="game-mode" onchange="onModeChange()" style="padding: 6px; border-radius: 6px; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color);">
-                    <option value="pvp">2 Jugadores (Local)</option>
-                    <option value="pve">vs IA</option>
-                </select>
-            </div>
+                <!-- Pestaña de Juegos -->
+                <div id="games" class="tab-content">
+                    <div class="card" style="text-align: center;">
+                        <h2>WLM Retro Mini-Game 🎮</h2>
+                        
+                        <!-- Selectores de Modo y Dificultad -->
+                        <div style="margin-bottom: 15px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                            <div>
+                                <label for="game-mode" style="font-size: 0.85rem;">Modo: </label>
+                                <select id="game-mode" onchange="onModeChange()" style="padding: 6px; border-radius: 6px; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color);">
+                                    <option value="pvp">2 Jugadores (Local)</option>
+                                    <option value="pve">vs IA</option>
+                                </select>
+                            </div>
 
-            <div id="difficulty-container" style="display: none;">
-                <label for="game-difficulty" style="font-size: 0.85rem;">Dificultad: </label>
-                <select id="game-difficulty" onchange="resetGame()" style="padding: 6px; border-radius: 6px; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color);">
-                    <option value="easy">😊 Fácil</option>
-                    <option value="medium">😐 Medio</option>
-                    <option value="hard">😈 Imbatible</option>
-                </select>
-            </div>
-        </div>
+                            <div id="difficulty-container" style="display: none;">
+                                <label for="game-difficulty" style="font-size: 0.85rem;">Dificultad: </label>
+                                <select id="game-difficulty" onchange="resetGame()" style="padding: 6px; border-radius: 6px; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color);">
+                                    <option value="easy">😊 Fácil</option>
+                                    <option value="medium">😐 Medio</option>
+                                    <option value="hard">😈 Imbatible</option>
+                                </select>
+                            </div>
+                        </div>
 
-        <p id="game-status">Turno de: Jugador X</p>
-        
-        <div class="board">
-            <div class="cell" onclick="makeMove(0)"></div>
-            <div class="cell" onclick="makeMove(1)"></div>
-            <div class="cell" onclick="makeMove(2)"></div>
-            <div class="cell" onclick="makeMove(3)"></div>
-            <div class="cell" onclick="makeMove(4)"></div>
-            <div class="cell" onclick="makeMove(5)"></div>
-            <div class="cell" onclick="makeMove(6)"></div>
-            <div class="cell" onclick="makeMove(7)"></div>
-            <div class="cell" onclick="makeMove(8)"></div>
-        </div>
-        
-        <button class="btn-reset" onclick="resetGame()">Reiniciar Partida</button>
-    </div>
-</div>
-
-<!-- Importación de "DLLs" externas -->
-<script src="router.js"></script>
-<script src="ia-engine.js"></script>
-<script src="game-logic.js"></script>
-
+                        <p id="game-status">Turno de: Jugador X</p>
+                        
+                        <div class="board">
+                            <div class="cell" onclick="makeMove(0)"></div>
+                            <div class="cell" onclick="makeMove(1)"></div>
+                            <div class="cell" onclick="makeMove(2)"></div>
+                            <div class="cell" onclick="makeMove(3)"></div>
+                            <div class="cell" onclick="makeMove(4)"></div>
+                            <div class="cell" onclick="makeMove(5)"></div>
+                            <div class="cell" onclick="makeMove(6)"></div>
+                            <div class="cell" onclick="makeMove(7)"></div>
+                            <div class="cell" onclick="makeMove(8)"></div>
+                        </div>
+                        
+                        <button class="btn-reset" onclick="resetGame()">Reiniciar Partida</button>
+                    </div>
+                </div>
 
                 <div id="windows" class="tab-content">
                     <div class="card">
@@ -325,50 +318,9 @@
         </div>
     </div>
 
-    <script>
-        function switchTab(tabId, element) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            
-            document.getElementById(tabId).classList.add('active');
-            element.classList.add('active');
-        }
-
-        let board = ['', '', '', '', '', '', '', '', ''];
-        let turn = 'X';
-        let active = true;
-
-        function makeMove(i) {
-            if (board[i] !== '' || !active) return;
-            board[i] = turn;
-            const cells = document.querySelectorAll('.cell');
-            cells[i].innerText = turn;
-            cells[i].classList.add(turn.toLowerCase());
-            
-            if (checkWin()) {
-                document.getElementById('game-status').innerText = `¡Gana el Jugador ${turn}! 🎉`;
-                active = false;
-            } else if (!board.includes('')) {
-                document.getElementById('game-status').innerText = '¡Empate!';
-                active = false;
-            } else {
-                turn = turn === 'X' ? 'O' : 'X';
-                document.getElementById('game-status').innerText = `Turno de: Jugador ${turn}`;
-            }
-        }
-
-        function checkWin() {
-            const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-            return wins.some(w => board[w[0]] && board[w[0]] === board[w[1]] && board[w[0]] === board[w[2]]);
-        }
-
-        function resetGame() {
-            board = ['', '', '', '', '', '', '', '', ''];
-            turn = 'X';
-            active = true;
-            document.getElementById('game-status').innerText = 'Turno de: Jugador X';
-            document.querySelectorAll('.cell').forEach(c => { c.innerText = ''; c.classList.remove('x','o'); });
-        }
-    </script>
+    <!-- Importación de Módulos Externos JS -->
+    <script src="router.js"></script>
+    <script src="ia-engine.js"></script>
+    <script src="game-logic.js"></script>
 </body>
 </html>
