@@ -1,4 +1,4 @@
-// game-logic.js - Lógica del juego y control de la UI
+// game-logic.js - Lógica del Juego y Chat Integrado
 
 let board = ['', '', '', '', '', '', '', '', ''];
 let turn = 'X';
@@ -8,7 +8,6 @@ function onModeChange() {
     const mode = document.getElementById('game-mode').value;
     const diffContainer = document.getElementById('difficulty-container');
     
-    // Muestra u oculta el combo de Dificultad si se elige VS IA
     if (mode === 'pve') {
         diffContainer.style.display = 'inline-block';
     } else {
@@ -23,7 +22,7 @@ function makeMove(i) {
     executeMove(i, turn);
 
     const mode = document.getElementById('game-mode').value;
-    const difficulty = document.getElementById('game-difficulty').value;
+    const difficulty = document.getElementById('game-difficulty') ? document.getElementById('game-difficulty').value : 'easy';
     
     if (mode === 'pve' && active && turn === 'O') {
         setTimeout(() => {
@@ -66,10 +65,12 @@ function resetGame() {
     document.querySelectorAll('.cell').forEach(c => { c.innerText = ''; c.classList.remove('x','o'); });
 }
 
+// Función del Chat Retro
 function sendMessage() {
     const input = document.getElementById('chat-input');
     const history = document.getElementById('chat-history');
     const text = input.value.trim();
+    const mode = document.getElementById('game-mode').value;
 
     if (text !== '') {
         const msg = document.createElement('div');
@@ -79,8 +80,8 @@ function sendMessage() {
         input.value = '';
         history.scrollTop = history.scrollHeight;
 
-        // Si estás jugando contra la IA, te responde automáticamente
-        if (gameMode === 'pve' && gameActive) {
+        // Respuesta automática simulada de la IA
+        if (mode === 'pve' && active) {
             setTimeout(() => {
                 const iaMsg = document.createElement('div');
                 iaMsg.style.marginBottom = '4px';
@@ -92,7 +93,7 @@ function sendMessage() {
                 iaMsg.innerHTML = `<strong>IA:</strong> ${randomResp}`;
                 history.appendChild(iaMsg);
                 history.scrollTop = history.scrollHeight;
-            }, 800);
+            }, 700);
         }
     }
 }
