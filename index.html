@@ -248,24 +248,54 @@
                     </div>
                 </div>
 
-                <div id="games" class="tab-content">
-                    <div class="card" style="text-align: center;">
-                        <h2>WLM Retro Mini-Game 🎮</h2>
-                        <p id="game-status">Turno de: Jugador X</p>
-                        <div class="board">
-                            <div class="cell" onclick="makeMove(0)"></div>
-                            <div class="cell" onclick="makeMove(1)"></div>
-                            <div class="cell" onclick="makeMove(2)"></div>
-                            <div class="cell" onclick="makeMove(3)"></div>
-                            <div class="cell" onclick="makeMove(4)"></div>
-                            <div class="cell" onclick="makeMove(5)"></div>
-                            <div class="cell" onclick="makeMove(6)"></div>
-                            <div class="cell" onclick="makeMove(7)"></div>
-                            <div class="cell" onclick="makeMove(8)"></div>
-                        </div>
-                        <button class="btn-reset" onclick="resetGame()">Reiniciar Partida</button>
-                    </div>
-                </div>
+    <!-- Pestaña de Juegos -->
+<div id="games" class="tab-content">
+    <div class="card" style="text-align: center;">
+        <h2>WLM Retro Mini-Game 🎮</h2>
+        
+        <!-- Selectores estilo Metro/Windows -->
+        <div style="margin-bottom: 15px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+            <div>
+                <label for="game-mode" style="font-size: 0.85rem;">Modo: </label>
+                <select id="game-mode" onchange="onModeChange()" style="padding: 6px; border-radius: 6px; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color);">
+                    <option value="pvp">2 Jugadores (Local)</option>
+                    <option value="pve">vs IA</option>
+                </select>
+            </div>
+
+            <div id="difficulty-container" style="display: none;">
+                <label for="game-difficulty" style="font-size: 0.85rem;">Dificultad: </label>
+                <select id="game-difficulty" onchange="resetGame()" style="padding: 6px; border-radius: 6px; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color);">
+                    <option value="easy">😊 Fácil</option>
+                    <option value="medium">😐 Medio</option>
+                    <option value="hard">😈 Imbatible</option>
+                </select>
+            </div>
+        </div>
+
+        <p id="game-status">Turno de: Jugador X</p>
+        
+        <div class="board">
+            <div class="cell" onclick="makeMove(0)"></div>
+            <div class="cell" onclick="makeMove(1)"></div>
+            <div class="cell" onclick="makeMove(2)"></div>
+            <div class="cell" onclick="makeMove(3)"></div>
+            <div class="cell" onclick="makeMove(4)"></div>
+            <div class="cell" onclick="makeMove(5)"></div>
+            <div class="cell" onclick="makeMove(6)"></div>
+            <div class="cell" onclick="makeMove(7)"></div>
+            <div class="cell" onclick="makeMove(8)"></div>
+        </div>
+        
+        <button class="btn-reset" onclick="resetGame()">Reiniciar Partida</button>
+    </div>
+</div>
+
+<!-- Importación de "DLLs" externas -->
+<script src="router.js"></script>
+<script src="ia-engine.js"></script>
+<script src="game-logic.js"></script>
+
 
                 <div id="windows" class="tab-content">
                     <div class="card">
