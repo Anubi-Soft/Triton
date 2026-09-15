@@ -33,37 +33,33 @@
             color: var(--text-color);
             margin: 0;
             padding: 0;
-            display: flex;
             height: 100vh;
             overflow: hidden;
         }
 
-        app-window {
-    display: flex;
-    width: 100vw;
-    height: 100vh;
-    background-color: var(--bg-color);
-    overflow: hidden;
-    position: relative;
-}
+        .app-window {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-color);
+            overflow: hidden;
+            position: relative;
+        }
 
-        /* Sidebar para Escritorio/Horizontal */
-.sidebar {
-    width: 70px;
-    height: 100vh;
-    background-color: var(--sidebar-bg);
-    border-right: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 15px;
-    gap: 10px;
-    z-index: 100;
-    flex-shrink: 0;
-    position: relative;
-    top: 0;
-}
-        
+        /* Sidebar para Escritorio */
+        .sidebar {
+            width: 70px;
+            height: 100vh;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 15px;
+            gap: 10px;
+            z-index: 100;
+            flex-shrink: 0;
+        }
 
         .nav-item {
             width: 48px;
@@ -98,13 +94,14 @@
 
         .nav-item-bottom { margin-top: auto; margin-bottom: 15px; }
 
-        /* Contenido principal */
+        /* Contenido principal con scroll habilitado */
         .main-content {
             flex: 1;
             display: flex;
             flex-direction: column;
             overflow-y: auto;
-            padding-bottom: 70px;
+            height: 100vh;
+            -webkit-overflow-scrolling: touch;
         }
 
         .top-banner {
@@ -146,7 +143,7 @@
             font-weight: bold;
         }
 
-        /* Estilos del Tres en Raya */
+        /* Estilos del Ta-Te-Ti */
         .board {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -189,11 +186,16 @@
             fill: currentColor;
         }
 
-        /* Adaptación Móvil Garantizada */
+        /* Adaptación Móvil */
         @media (max-width: 768px) {
-            .app-window { flex-direction: column; }
+            .app-window { 
+                flex-direction: column; 
+            }
             
-            .main-content { padding-bottom: 80px; }
+            .main-content { 
+                height: calc(100vh - 60px);
+                padding-bottom: 30px; 
+            }
 
             .sidebar {
                 position: fixed;
@@ -254,64 +256,63 @@
                 </div>
 
                 <!-- Pestaña de Juegos -->
-<div id="games" class="tab-content">
-    <div class="card" style="text-align: center;">
-        <h2>WLM Retro Mini-Game 🎮</h2>
-        
-        <!-- Selectores de Modo y Dificultad -->
-        <div style="margin-bottom: 15px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-            <div>
-                <label for="game-mode" style="font-size: 0.85rem;">Modo: </label>
-                <select id="game-mode" onchange="onModeChange()" style="padding: 6px; border-radius: 6px; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color);">
-                    <option value="pvp-local">2 Jugadores (Mismo Celular)</option>
-                    <option value="pvp-online">2 Jugadores (Online P2P)</option>
-                    <option value="pve">vs IA</option>
-                </select>
-            </div>
+                <div id="games" class="tab-content">
+                    <div class="card" style="text-align: center;">
+                        <h2>WLM Retro Mini-Game 🎮</h2>
+                        
+                        <!-- Selectores de Modo y Dificultad -->
+                        <div style="margin-bottom: 15px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                            <div>
+                                <label for="game-mode" style="font-size: 0.85rem;">Modo: </label>
+                                <select id="game-mode" onchange="onModeChange()" style="padding: 6px; border-radius: 6px; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color);">
+                                    <option value="pvp-local">2 Jugadores (Mismo Celular)</option>
+                                    <option value="pvp-online">2 Jugadores (Online P2P)</option>
+                                    <option value="pve">vs IA</option>
+                                </select>
+                            </div>
 
-            <div id="difficulty-container" style="display: none;">
-                <label for="game-difficulty" style="font-size: 0.85rem;">Dificultad: </label>
-                <select id="game-difficulty" onchange="resetGame()" style="padding: 6px; border-radius: 6px; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color);">
-                    <option value="easy">😊 Fácil</option>
-                    <option value="medium">😐 Medio</option>
-                    <option value="hard">😈 Imbatible</option>
-                </select>
-            </div>
-        </div>
+                            <div id="difficulty-container" style="display: none;">
+                                <label for="game-difficulty" style="font-size: 0.85rem;">Dificultad: </label>
+                                <select id="game-difficulty" onchange="resetGame()" style="padding: 6px; border-radius: 6px; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color);">
+                                    <option value="easy">😊 Fácil</option>
+                                    <option value="medium">😐 Medio</option>
+                                    <option value="hard">😈 Imbatible</option>
+                                </select>
+                            </div>
+                        </div>
 
-        <p id="game-status">Turno de: Jugador X</p>
-        
-        <div class="board">
-            <div class="cell" onclick="makeMove(0)"></div>
-            <div class="cell" onclick="makeMove(1)"></div>
-            <div class="cell" onclick="makeMove(2)"></div>
-            <div class="cell" onclick="makeMove(3)"></div>
-            <div class="cell" onclick="makeMove(4)"></div>
-            <div class="cell" onclick="makeMove(5)"></div>
-            <div class="cell" onclick="makeMove(6)"></div>
-            <div class="cell" onclick="makeMove(7)"></div>
-            <div class="cell" onclick="makeMove(8)"></div>
-        </div>
-        
-        <button class="btn-reset" onclick="resetGame()" style="margin-bottom: 20px;">Reiniciar Partida</button>
+                        <p id="game-status">Turno de: Jugador X</p>
+                        
+                        <div class="board">
+                            <div class="cell" onclick="makeMove(0)"></div>
+                            <div class="cell" onclick="makeMove(1)"></div>
+                            <div class="cell" onclick="makeMove(2)"></div>
+                            <div class="cell" onclick="makeMove(3)"></div>
+                            <div class="cell" onclick="makeMove(4)"></div>
+                            <div class="cell" onclick="makeMove(5)"></div>
+                            <div class="cell" onclick="makeMove(6)"></div>
+                            <div class="cell" onclick="makeMove(7)"></div>
+                            <div class="cell" onclick="makeMove(8)"></div>
+                        </div>
+                        
+                        <button class="btn-reset" onclick="resetGame()" style="margin-bottom: 20px;">Reiniciar Partida</button>
 
-        <!-- Cuadro de Chat Retro MSN -->
-        <div style="border-top: 1px solid var(--border-color); padding-top: 15px; text-align: left;">
-            <span style="font-size: 0.85rem; font-weight: bold; color: var(--accent-color);">💬 Chat de la Sala</span>
-            
-            <div id="chat-history" style="height: 100px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; margin: 8px 0; overflow-y: auto; font-size: 0.85rem;">
-                <div style="opacity: 0.6; font-style: italic;">¡Bienvenido al chat! Hablá con tu rival...</div>
-            </div>
+                        <!-- Cuadro de Chat Retro MSN -->
+                        <div style="border-top: 1px solid var(--border-color); padding-top: 15px; text-align: left;">
+                            <span style="font-size: 0.85rem; font-weight: bold; color: var(--accent-color);">💬 Chat de la Sala</span>
+                            
+                            <div id="chat-history" style="height: 100px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; margin: 8px 0; overflow-y: auto; font-size: 0.85rem;">
+                                <div style="opacity: 0.6; font-style: italic;">¡Bienvenido al chat! Hablá con tu rival...</div>
+                            </div>
 
-            <div style="display: flex; gap: 6px;">
-                <input type="text" id="chat-input" placeholder="Escribí un mensaje..." onkeypress="if(event.key==='Enter') sendMessage()" style="flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); font-size: 0.85rem; outline: none;">
-                <button onclick="sendMessage()" style="background-color: var(--accent-color); color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600;">Enviar</button>
-            </div>
-        </div>
-    </div>
-</div>
+                            <div style="display: flex; gap: 6px;">
+                                <input type="text" id="chat-input" placeholder="Escribí un mensaje..." onkeypress="if(event.key==='Enter') sendMessage()" style="flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); font-size: 0.85rem; outline: none;">
+                                <button onclick="sendMessage()" style="background-color: var(--accent-color); color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600;">Enviar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                
                 <div id="windows" class="tab-content">
                     <div class="card">
                         <h2>Proyectos Windows 🪟</h2>
