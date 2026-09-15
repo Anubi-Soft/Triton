@@ -250,7 +250,7 @@
                 </div>
 
                 <!-- Pestaña de Juegos -->
- <div id="games" class="tab-content">
+<div id="games" class="tab-content">
     <div class="card" style="text-align: center;">
         <h2>WLM Retro Mini-Game 🎮</h2>
         
@@ -259,7 +259,8 @@
             <div>
                 <label for="game-mode" style="font-size: 0.85rem;">Modo: </label>
                 <select id="game-mode" onchange="onModeChange()" style="padding: 6px; border-radius: 6px; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color);">
-                    <option value="pvp">2 Jugadores (Local)</option>
+                    <option value="pvp-local">2 Jugadores (Mismo Celular)</option>
+                    <option value="pvp-online">2 Jugadores (Online P2P)</option>
                     <option value="pve">vs IA</option>
                 </select>
             </div>
@@ -305,7 +306,6 @@
         </div>
     </div>
 </div>
-
 
                 
                 <div id="windows" class="tab-content">
