@@ -65,3 +65,34 @@ function resetGame() {
     document.getElementById('game-status').innerText = 'Turno de: Jugador X';
     document.querySelectorAll('.cell').forEach(c => { c.innerText = ''; c.classList.remove('x','o'); });
 }
+
+function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const history = document.getElementById('chat-history');
+    const text = input.value.trim();
+
+    if (text !== '') {
+        const msg = document.createElement('div');
+        msg.style.marginBottom = '4px';
+        msg.innerHTML = `<strong>Tú:</strong> ${text}`;
+        history.appendChild(msg);
+        input.value = '';
+        history.scrollTop = history.scrollHeight;
+
+        // Si estás jugando contra la IA, te responde automáticamente
+        if (gameMode === 'pve' && gameActive) {
+            setTimeout(() => {
+                const iaMsg = document.createElement('div');
+                iaMsg.style.marginBottom = '4px';
+                iaMsg.style.color = 'var(--accent-color)';
+                
+                const responses = ["¡Buen movimiento!", "Mmm... déjame pensar 🤔", "¡Esa no me la esperaba!", "¡Te voy a ganar esta ronda! 😈"];
+                const randomResp = responses[Math.floor(Math.random() * responses.length)];
+                
+                iaMsg.innerHTML = `<strong>IA:</strong> ${randomResp}`;
+                history.appendChild(iaMsg);
+                history.scrollTop = history.scrollHeight;
+            }, 800);
+        }
+    }
+}
