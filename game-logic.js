@@ -1,4 +1,4 @@
-// game-logic.js - Lógica del Juego y Chat Integrado
+// game-logic.js - Lógica del Ta-Te-Ti y Chat Interactivo
 
 let board = ['', '', '', '', '', '', '', '', ''];
 let turn = 'X';
@@ -30,7 +30,7 @@ function makeMove(i) {
             if (aiMove !== null) {
                 executeMove(aiMove, 'O');
             }
-        }, 300);
+        }, 400);
     }
 }
 
@@ -65,35 +65,63 @@ function resetGame() {
     document.querySelectorAll('.cell').forEach(c => { c.innerText = ''; c.classList.remove('x','o'); });
 }
 
-// Función del Chat Retro
+// Chat Inteligente con comandos de inicio de juego
 function sendMessage() {
     const input = document.getElementById('chat-input');
     const history = document.getElementById('chat-history');
-    const text = input.value.trim();
+    const rawText = input.value.trim();
+    const text = rawText.toLowerCase();
     const mode = document.getElementById('game-mode').value;
 
     if (text !== '') {
         const msg = document.createElement('div');
         msg.style.marginBottom = '4px';
-        msg.innerHTML = `<strong>Tú:</strong> ${text}`;
+        msg.innerHTML = `<strong>Tú:</strong> ${rawText}`;
         history.appendChild(msg);
         input.value = '';
         history.scrollTop = history.scrollHeight;
 
-        // Respuesta automática simulada de la IA
-        if (mode === 'pve' && active) {
+        // Respuesta interactiva si jugamos vs IA
+        if (mode === 'pve') {
             setTimeout(() => {
                 const iaMsg = document.createElement('div');
                 iaMsg.style.marginBottom = '4px';
                 iaMsg.style.color = 'var(--accent-color)';
                 
-                const responses = ["¡Buen movimiento!", "Mmm... déjame pensar 🤔", "¡Esa no me la esperaba!", "¡Te voy a ganar esta ronda! 😈"];
-                const randomResp = responses[Math.floor(Math.random() * responses.length)];
-                
-                iaMsg.innerHTML = `<strong>IA:</strong> ${randomResp}`;
+                let response = "";
+
+                // Detecta si preguntás por empezar
+                if (text.includes('comenzamos') || text.includes('empezamos') || text.includes('arrancamos') || text.includes('jugamos')) {
+                    response = "¡Dale! ¿Arrancás vos con 'X' o querés que empiece yo? Escribí 'empezá vos' si te animás 😈";
+                } 
+                else if (text.includes('empeza vos') || text.includes('empezá vos') || text.includes('inicia vos') || text.includes('comenza vos')) {
+                    response = "¡Acepto el reto! Muevo primero...";
+                    
+                    // Si el tablero está vacío, resetea y hace mover a la IA como O
+                    if (board.every(cell => cell === '')) {
+                        turn = 'O';
+                        const difficulty = document.getElementById('game-difficulty') ? document.getElementById('game-difficulty').value : 'easy';
+                        let aiMove = IAEngine.getBestMove(board, 'O', 'X', difficulty);
+                        if (aiMove !== null) {
+                            executeMove(aiMove, 'O');
+                        }
+                    }
+                } 
+                else {
+                    const randomResponses = [
+                        "¡Buen movimiento!",
+                        "Mmm... déjame pensar la jugada 🤔",
+                        "¡Ojo con esa esquina!",
+                        "Te tengo rodeado 😈",
+                        "¡Esta partida es mía!"
+                    ];
+                    response = randomResponses[Math.floor(Math.random() * randomResponses.length)];
+                }
+
+                iaMsg.innerHTML = `<strong>IA:</strong> ${response}`;
                 history.appendChild(iaMsg);
                 history.scrollTop = history.scrollHeight;
-            }, 700);
+            }, 600);
         }
     }
 }
