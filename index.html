@@ -4,222 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AnubiSoft - Portal Oficial</title>
-    <style>
-        :root {
-            --bg-color: #121212;
-            --sidebar-bg: #181818;
-            --card-bg: #1f1f1f;
-            --text-color: #f3f3f3;
-            --accent-color: #0078d4;
-            --border-color: #2b2b2b;
-        }
-
-        @media (prefers-color-scheme: light) {
-            :root {
-                --bg-color: #f3f3f3;
-                --sidebar-bg: #e7e7e7;
-                --card-bg: #ffffff;
-                --text-color: #1b1b1b;
-                --accent-color: #0078d4;
-                --border-color: #e0e0e0;
-            }
-        }
-
-        * { 
-            box-sizing: border-box; 
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: "Segoe UI Variable Text", "Segoe UI", -apple-system, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            min-height: 100vh;
-        }
-
-        .app-window {
-            display: flex;
-            min-height: 100vh;
-            width: 100vw;
-            background-color: var(--bg-color);
-        }
-
-        /* Sidebar para Escritorio */
-        .sidebar {
-            width: 70px;
-            background-color: var(--sidebar-bg);
-            border-right: 1px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 15px;
-            gap: 10px;
-            z-index: 100;
-            flex-shrink: 0;
-            position: sticky;
-            top: 0;
-            height: 100vh;
-        }
-
-        .nav-item {
-            width: 48px;
-            height: 48px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.3rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-            color: var(--text-color);
-        }
-
-        .nav-item:hover { background-color: rgba(255, 255, 255, 0.08); }
-
-        .nav-item.active {
-            background-color: rgba(0, 120, 212, 0.15);
-            color: var(--accent-color);
-        }
-
-        .nav-item.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            width: 4px;
-            height: 24px;
-            background-color: var(--accent-color);
-            border-radius: 0 4px 4px 0;
-        }
-
-        .nav-item-bottom { margin-top: auto; margin-bottom: 15px; }
-
-        /* Contenido principal */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-        }
-
-        .top-banner {
-            background: linear-gradient(135deg, var(--accent-color), #004578);
-            color: white;
-            padding: 16px 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            width: 100%;
-        }
-
-        .top-banner h1 { margin: 0; font-size: 1.4rem; font-weight: 600; }
-        .top-banner p { margin: 0; font-size: 0.8rem; opacity: 0.9; }
-
-        .container {
-            padding: 20px;
-            max-width: 800px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-        }
-
-        .badge {
-            display: inline-block;
-            background-color: var(--accent-color);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: bold;
-        }
-
-        /* Estilos del Ta-Te-Ti */
-        .board {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            max-width: 270px;
-            margin: 15px auto;
-        }
-
-        .cell {
-            width: 80px;
-            height: 80px;
-            background-color: var(--bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 2rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
-        .cell.x { color: #e74c3c; }
-        .cell.o { color: #3498db; }
-
-        .btn-reset {
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .win11-icon {
-            width: 22px;
-            height: 22px;
-            fill: currentColor;
-        }
-
-        /* Adaptación Móvil */
-        @media (max-width: 768px) {
-            .app-window { 
-                flex-direction: column; 
-            }
-            
-            .main-content { 
-                padding-bottom: 90px; /* Margen amplio para que el chat no choque con la barra */
-            }
-
-            .sidebar {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                width: 100%;
-                height: 65px;
-                flex-direction: row;
-                justify-content: space-around;
-                padding-top: 0;
-                border-right: none;
-                border-top: 1px solid var(--border-color);
-                background-color: var(--sidebar-bg);
-            }
-
-            .nav-item-bottom { margin-top: 0; margin-bottom: 0; }
-            
-            .nav-item.active::before {
-                left: auto;
-                bottom: 0;
-                width: 24px;
-                height: 4px;
-                border-radius: 4px 4px 0 0;
-            }
-        }
-    </style>
+    <!-- Vinculación del CSS Externo -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/news.css">
 </head>
 <body>
 
@@ -238,79 +25,44 @@
         </div>
 
         <div class="main-content">
-            <div class="top-banner">
-                <h1>AnubiSoft</h1>
-                <p>Desarrollo & Preservación Retro | Official Hub</p>
-            </div>
+            <!-- Banner Ahumado con Logo de AnubiSoft y Botón de Tema -->
+            <header class="hero-banner">
+                <!-- Botón de cambio de tema (Sol/Luna) -->
+                <button id="themeToggle" class="theme-toggle-btn" aria-label="Cambiar tema">
+                    <svg id="themeIcon" viewBox="0 0 24 24">
+                        <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-5.4-5.4c0-1.81.89-3.42 2.26-4.4C12.92 3.04 12.46 3 12 3z"/>
+                    </svg>
+                </button>
+
+                <!-- Contenedor alineado horizontalmente (Logo + Textos) -->
+                <div class="banner-content">
+                    <img src="assets/img/logo_anubisoft.png" alt="AnubiSoft Logo" class="brand-logo">
+                    <div class="brand-text-wrapper">
+                        <h1 class="brand-title">AnubiSoft</h1>
+                        <p class="brand-subtitle">Desarrollo & Preservación Retro | Official Hub</p>
+                    </div>
+                </div>
+            </header>
 
             <div class="container">
+                <!-- Pestaña Tritón -->
                 <div id="triton" class="tab-content active">
                     <div class="card">
                         <span class="badge">🏗️ En Desarrollo Activo</span>
-                        <h2>Proyecto Tritón 🔱</h2>
+                        <h2 class="section-title-triton">Proyecto Tritón 🔱</h2>
                         <p>Plataforma y cliente nativo de mensajería para Android, integrado con los servidores de <strong>Escargot</strong> para revivir la experiencia del clásico Windows Live Messenger.</p>
                         <p>Próximamente publicaremos las APKs de prueba, guías de registro y soporte para cifrado E2EE.</p>
                     </div>
                 </div>
 
-                <!-- Pestaña de Juegos -->
+                <!-- Pestaña de Juegos (Módulo Dinámico) -->
                 <div id="games" class="tab-content">
-                    <div class="card" style="text-align: center;">
-                        <h2>WLM Retro Mini-Game 🎮</h2>
-                        
-                        <!-- Selectores de Modo y Dificultad -->
-                        <div style="margin-bottom: 15px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                            <div>
-                                <label for="game-mode" style="font-size: 0.85rem;">Modo: </label>
-                                <select id="game-mode" onchange="onModeChange()" style="padding: 6px; border-radius: 6px; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color);">
-                                    <option value="pvp-local">2 Jugadores (Mismo Celular)</option>
-                                    <option value="pvp-online">2 Jugadores (Online P2P)</option>
-                                    <option value="pve">vs IA</option>
-                                </select>
-                            </div>
-
-                            <div id="difficulty-container" style="display: none;">
-                                <label for="game-difficulty" style="font-size: 0.85rem;">Dificultad: </label>
-                                <select id="game-difficulty" onchange="resetGame()" style="padding: 6px; border-radius: 6px; background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color);">
-                                    <option value="easy">😊 Fácil</option>
-                                    <option value="medium">😐 Medio</option>
-                                    <option value="hard">😈 Imbatible</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <p id="game-status">Turno de: Jugador X</p>
-                        
-                        <div class="board">
-                            <div class="cell" onclick="makeMove(0)"></div>
-                            <div class="cell" onclick="makeMove(1)"></div>
-                            <div class="cell" onclick="makeMove(2)"></div>
-                            <div class="cell" onclick="makeMove(3)"></div>
-                            <div class="cell" onclick="makeMove(4)"></div>
-                            <div class="cell" onclick="makeMove(5)"></div>
-                            <div class="cell" onclick="makeMove(6)"></div>
-                            <div class="cell" onclick="makeMove(7)"></div>
-                            <div class="cell" onclick="makeMove(8)"></div>
-                        </div>
-                        
-                        <button class="btn-reset" onclick="resetGame()" style="margin-bottom: 20px;">Reiniciar Partida</button>
-
-                        <!-- Cuadro de Chat Retro MSN -->
-                        <div style="border-top: 1px solid var(--border-color); padding-top: 15px; text-align: left;">
-                            <span style="font-size: 0.85rem; font-weight: bold; color: var(--accent-color);">💬 Chat de la Sala</span>
-                            
-                            <div id="chat-history" style="height: 100px; background: var(--bg-color); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; margin: 8px 0; overflow-y: auto; font-size: 0.85rem;">
-                                <div style="opacity: 0.6; font-style: italic;">¡Bienvenido al chat! Hablá con tu rival...</div>
-                            </div>
-
-                            <div style="display: flex; gap: 6px;">
-                                <input type="text" id="chat-input" placeholder="Escribí un mensaje..." onkeypress="if(event.key==='Enter') sendMessage()" style="flex: 1; padding: 8px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-color); font-size: 0.85rem; outline: none;">
-                                <button onclick="sendMessage()" style="background-color: var(--accent-color); color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600;">Enviar</button>
-                            </div>
-                        </div>
+                    <div id="games-container">
+                        <!-- Cargar el módulo aquí dinámicamente con loader.js -->
                     </div>
                 </div>
 
+                <!-- Pestaña Windows -->
                 <div id="windows" class="tab-content">
                     <div class="card">
                         <h2>Proyectos Windows 🪟</h2>
@@ -318,19 +70,20 @@
                     </div>
                 </div>
 
-                <div id="news" class="tab-content">
-                    <div class="card">
-                        <h2>Boletín Informativo 📰</h2>
-                        <p>Capturas de pantalla, avances de UI en Kotlin e hitos del proyecto serán publicados aquí periódicamente.</p>
-                    </div>
-                </div>
+              <!-- Pestaña Novedades -->
+<div id="news" class="tab-content">
+    <div id="news-container">
+        <!-- Se cargará dinámicamente news.html desde loader.js -->
+    </div>
+</div>
 
+                <!-- Pestaña Acerca De -->
                 <div id="about" class="tab-content">
                     <div class="card">
                         <h2>Acerca de AnubiSoft ℹ️</h2>
                         <p>Somos un equipo apasionado por la programación, el software libre y la preservación de la nostalgia digital.</p>
                         <p>Colaboramos activamente con la comunidad para hacer crecer proyectos como <strong>Escargot</strong>.</p>
-                        <p style="font-size: 0.85rem; opacity: 0.8; margin-top: 20px;">
+                        <p class="copyright-text">
                             &copy; 2026 AnubiSoft. Alojado con orgullo en GitHub Pages.
                         </p>
                     </div>
@@ -339,9 +92,11 @@
         </div>
     </div>
 
-    <!-- Importación de Módulos Externos JS -->
-    <script src="router.js"></script>
-    <script src="ia-engine.js"></script>
-    <script src="game-logic.js"></script>
+    <!-- Importación de Módulos JS -->
+    <script src="js/loader.js"></script>
+    <script src="js/news.js"></script>
+    <script src="js/router.js"></script>
+    <script src="js/ia-engine.js"></script>
+    <script src="js/game-logic.js"></script>
 </body>
 </html>
