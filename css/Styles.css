@@ -1,0 +1,426 @@
+/* =========================================================
+   1. FUENTES LOCALES (assets/fonts)
+   ========================================================= */
+@font-face {
+  font-family: 'GoWFont';
+  src: url('assets/fonts/GoW.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'CSFont';
+  src: url('assets/fonts/CS.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* =========================================================
+   2. VARIABLES Y TEMAS (DARK / LIGHT)
+   ========================================================= */
+:root {
+  --color-brand-blue: #0088ff;
+  --color-brand-cyan: #00d4ff;
+  --color-brand-orange: #ff7700;
+
+  --bg-color: #0d1117;
+  --sidebar-bg: #161b22;
+  --card-bg: #1f242d;
+  --text-color: #f0f6fc;
+  --text-muted: #8b949e;
+  --accent-color: #0088ff;
+  --border-color: #2b3240;
+  --shadow-color: rgba(0, 136, 255, 0.25);
+}
+
+body.light-theme {
+  --bg-color: #f3f4f6;
+  --sidebar-bg: #eaedee;
+  --card-bg: #ffffff;
+  --text-color: #1f2937;
+  --text-muted: #6b7280;
+  --accent-color: #0066cc;
+  --border-color: #d1d5db;
+  --shadow-color: rgba(0, 102, 204, 0.12);
+}
+
+/* =========================================================
+   3. ESTILOS GENERALES
+   ========================================================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI Variable Text", "Segoe UI", -apple-system, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.app-window {
+  display: flex;
+  min-height: 100vh;
+  width: 100vw;
+  background-color: var(--bg-color);
+}
+
+/* =========================================================
+   4. BANNER GAMING (COMPACTO Y PROPORCIONADO)
+   ========================================================= */
+.hero-banner {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  position: relative;
+  overflow: hidden;
+
+  background: 
+    linear-gradient(90deg, rgba(5, 11, 20, 0.85) 0%, rgba(5, 11, 20, 0.4) 50%, rgba(5, 11, 20, 0.85) 100%),
+    url('assets/img/humo-azul.jpg') center/cover no-repeat;
+
+  border-bottom: 2px solid var(--color-brand-blue);
+  box-shadow: 0 4px 15px var(--shadow-color);
+}
+
+.theme-toggle-btn {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--color-brand-blue);
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-color);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+  transition: all 0.3s ease;
+  z-index: 10;
+}
+
+.theme-toggle-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 15px var(--color-brand-cyan);
+}
+
+.theme-toggle-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.banner-content {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+.brand-logo {
+  max-width: 50px;
+  height: auto;
+  filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.6));
+  flex-shrink: 0;
+}
+
+.brand-text-wrapper {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.brand-title {
+  font-family: 'GoWFont', serif;
+  font-size: 1.4rem;
+  color: #ffffff;
+  letter-spacing: 1.5px;
+  line-height: 1;
+  text-shadow: 
+    0 0 8px var(--color-brand-cyan),
+    0 0 16px var(--color-brand-blue);
+}
+
+.brand-subtitle {
+  font-size: 0.68rem;
+  color: var(--color-brand-cyan);
+  margin-top: 3px;
+  opacity: 0.9;
+  letter-spacing: 0.5px;
+}
+
+/* =========================================================
+   5. SIDEBAR (NAVEGACIÓN)
+   ========================================================= */
+.sidebar {
+  width: 70px;
+  background-color: var(--sidebar-bg);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 15px;
+  gap: 10px;
+  z-index: 100;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.nav-item {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  color: var(--text-color);
+}
+
+.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.nav-item.active {
+  background-color: rgba(0, 136, 255, 0.18);
+  color: var(--accent-color);
+}
+
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 4px;
+  height: 24px;
+  background-color: var(--accent-color);
+  border-radius: 0 4px 4px 0;
+}
+
+.nav-item-bottom {
+  margin-top: auto;
+  margin-bottom: 15px;
+}
+
+.win11-icon {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
+/* =========================================================
+   6. CONTENIDO Y TARJETAS
+   ========================================================= */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.container {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.badge {
+  display: inline-block;
+  background-color: var(--accent-color);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.text-center { text-align: center; }
+.hidden { display: none; }
+.label-sm { font-size: 0.85rem; }
+
+/* =========================================================
+   7. MINIJUEGO TA-TE-TI Y CHAT DE SALA
+   ========================================================= */
+.controls-wrapper {
+  margin-bottom: 15px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.select-style {
+  padding: 6px;
+  border-radius: 6px;
+  background: var(--bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  max-width: 270px;
+  margin: 15px auto;
+}
+
+.cell {
+  width: 80px;
+  height: 80px;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-size: 2rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.cell.x { color: #e74c3c; }
+.cell.o { color: #3498db; }
+
+.btn-reset {
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.chat-section {
+  border-top: 1px solid var(--border-color);
+  padding-top: 15px;
+  text-align: left;
+}
+
+.chat-title {
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: var(--accent-color);
+}
+
+.chat-box {
+  height: 100px;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 8px;
+  margin: 8px 0;
+  overflow-y: auto;
+  font-size: 0.85rem;
+}
+
+.chat-welcome {
+  opacity: 0.6;
+  font-style: italic;
+}
+
+.chat-input-wrapper {
+  display: flex;
+  gap: 6px;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.btn-send {
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.copyright-text {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin-top: 20px;
+}
+
+/* =========================================================
+   8. ADAPTACIÓN MÓVIL (ZÓCALO INFERIOR)
+   ========================================================= */
+@media (max-width: 768px) {
+  .app-window {
+    flex-direction: column !important;
+  }
+
+  .main-content {
+    padding-bottom: 80px !important;
+  }
+
+  .sidebar {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    top: auto !important;
+    width: 100% !important;
+    height: 60px !important;
+    flex-direction: row !important;
+    justify-content: space-around !important;
+    padding-top: 0 !important;
+    border-right: none !important;
+    border-top: 1px solid var(--border-color) !important;
+    background-color: var(--sidebar-bg) !important;
+    z-index: 1000 !important;
+  }
+
+  .nav-item-bottom {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  .nav-item.active::before {
+    left: auto !important;
+    bottom: 0 !important;
+    top: auto !important;
+    width: 24px !important;
+    height: 4px !important;
+    border-radius: 4px 4px 0 0 !important;
+  }
+}
