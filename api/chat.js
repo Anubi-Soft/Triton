@@ -1,5 +1,5 @@
 // =========================================================
-// api/chat.js - Diagnóstico Directo de Groq
+// api/chat.js - Conexión final con Groq (Llama 3)
 // =========================================================
 
 export default async function handler(req, res) {
@@ -10,15 +10,16 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método no permitido' });
 
-  const { message } = req.body;
+  const { message, systemPrompt } = req.body;
   const API_KEY = process.env.GROQ_API_KEY;
 
-  // 1. Diagnóstico de Key local en Vercel
   if (!API_KEY) {
-    return res.status(500).json({ 
-      reply: "DEBUG: La variable GROQ_API_KEY no existe en Vercel." 
-    });
+    return res.status(500).json({ reply: "¡Configuración de API Key pendiente en Vercel!" });
   }
+
+  const defaultPrompt = `Eres AnubiBot, la IA oficial del portal AnubiSoft. 
+Tu personalidad es gamer, retro, amigable y nostálgica (estilo MSN Messenger / Windows XP).
+Entiendes cualquier jerga o modismo actual, pero respondes corto, en español y con buena onda.`;
 
   try {
     const groqResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -28,29 +29,28 @@ export default async function handler(req, res) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "llama-3.1-8b-instant",
+        model: "llama3-8b-8192", // Modelo 100% compatible y gratis
         messages: [
-          { role: "system", content: "Responde en 1 frase retro estilo chat de juegos." },
+          { role: "system", content: systemPrompt || defaultPrompt },
           { role: "user", content: message || "Hola" }
         ],
-        max_tokens: 80
+        max_tokens: 100,
+        temperature: 0.7
       })
     });
 
     const data = await groqResponse.json();
 
-    // 2. Si Groq devuelve error, lo mostramos en el chat en vez de ocultarlo
     if (!groqResponse.ok) {
-      const errorDetail = data?.error?.message || JSON.stringify(data);
-      return res.status(200).json({ 
-        reply: `DEBUG GROQ (${groqResponse.status}): ${errorDetail}` 
-      });
+      console.error("Error en Groq:", data);
+      return res.status(500).json({ reply: "¡Uff, la API de Groq rechazó la conexión!" });
     }
 
-    const reply = data.choices?.[0]?.message?.content?.trim();
-    return res.status(200).json({ reply: reply || "Sin respuesta devuelta por el modelo." });
+    const reply = data.choices?.[0]?.message?.content?.trim() || "¡Uff, se cortó la señal del servidor retro!";
+    return res.status(200).json({ reply });
 
   } catch (err) {
-    return res.status(500).json({ reply: `DEBUG ERROR: ${err.message}` });
+    console.error("Error Serverless:", err);
+    return res.status(500).json({ reply: "¡Error interno en el servidor retro!" });
   }
 }
