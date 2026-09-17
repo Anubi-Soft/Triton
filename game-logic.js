@@ -66,7 +66,11 @@ function resetGame() {
 }
 
 // Chat Inteligente con comandos de inicio de juego
-function sendMessage() {
+// URL de tu microservicio en Vercel
+const BACKEND_URL = "https://triton-bxoj.vercel.app/api/chat";
+
+// Chat Inteligente conectado a Vercel / Llama 3
+async function sendMessage() {
     const input = document.getElementById('chat-input');
     const history = document.getElementById('chat-history');
     const rawText = input.value.trim();
@@ -74,54 +78,79 @@ function sendMessage() {
     const mode = document.getElementById('game-mode').value;
 
     if (text !== '') {
+        // 1. Mostrar mensaje del usuario
         const msg = document.createElement('div');
         msg.style.marginBottom = '4px';
-        msg.innerHTML = `<strong>Tú:</strong> ${rawText}`;
+        msg.innerHTML = `<strong>Tú:</strong> ${escapeHTML(rawText)}`;
         history.appendChild(msg);
         input.value = '';
         history.scrollTop = history.scrollHeight;
 
-        // Respuesta interactiva si jugamos vs IA
+        // Lógica de comandos especiales del juego (si querés que empiece la IA)
         if (mode === 'pve') {
-            setTimeout(() => {
+            if (text.includes('empeza vos') || text.includes('empezá vos') || text.includes('inicia vos') || text.includes('comenza vos')) {
+                if (board.every(cell => cell === '')) {
+                    turn = 'O';
+                    const difficulty = document.getElementById('game-difficulty') ? document.getElementById('game-difficulty').value : 'easy';
+                    let aiMove = IAEngine.getBestMove(board, 'O', 'X', difficulty);
+                    if (aiMove !== null) {
+                        executeMove(aiMove, 'O');
+                    }
+                }
+            }
+
+            // 2. Mostrar indicador de "Escribiendo..."
+            const typingMsg = document.createElement('div');
+            typingMsg.id = 'ai-typing';
+            typingMsg.style.marginBottom = '4px';
+            typingMsg.style.color = 'var(--accent-color, #00e5ff)';
+            typingMsg.innerHTML = `<strong>AnubiBot:</strong> <i>Escribiendo...</i>`;
+            history.appendChild(typingMsg);
+            history.scrollTop = history.scrollHeight;
+
+            try {
+                // 3. Petición a tu API en Vercel
+                const response = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: rawText })
+                });
+
+                const data = await response.json();
+                
+                // 4. Remover "Escribiendo..."
+                const typingElem = document.getElementById('ai-typing');
+                if (typingElem) typingElem.remove();
+
+                // 5. Mostrar respuesta de la IA
                 const iaMsg = document.createElement('div');
                 iaMsg.style.marginBottom = '4px';
-                iaMsg.style.color = 'var(--accent-color)';
+                iaMsg.style.color = 'var(--accent-color, #00e5ff)';
                 
-                let response = "";
-
-                // Detecta si preguntás por empezar
-                if (text.includes('comenzamos') || text.includes('empezamos') || text.includes('arrancamos') || text.includes('jugamos')) {
-                    response = "¡Dale! ¿Arrancás vos con 'X' o querés que empiece yo? Escribí 'empezá vos' si te animás 😈";
-                } 
-                else if (text.includes('empeza vos') || text.includes('empezá vos') || text.includes('inicia vos') || text.includes('comenza vos')) {
-                    response = "¡Acepto el reto! Muevo primero...";
-                    
-                    // Si el tablero está vacío, resetea y hace mover a la IA como O
-                    if (board.every(cell => cell === '')) {
-                        turn = 'O';
-                        const difficulty = document.getElementById('game-difficulty') ? document.getElementById('game-difficulty').value : 'easy';
-                        let aiMove = IAEngine.getBestMove(board, 'O', 'X', difficulty);
-                        if (aiMove !== null) {
-                            executeMove(aiMove, 'O');
-                        }
-                    }
-                } 
-                else {
-                    const randomResponses = [
-                        "¡Buen movimiento!",
-                        "Mmm... déjame pensar la jugada 🤔",
-                        "¡Ojo con esa esquina!",
-                        "Te tengo rodeado 😈",
-                        "¡Esta partida es mía!"
-                    ];
-                    response = randomResponses[Math.floor(Math.random() * randomResponses.length)];
-                }
-
-                iaMsg.innerHTML = `<strong>IA:</strong> ${response}`;
+                const replyText = data.reply || "¡Ups, tuve un micro-lag en mis circuitos retro!";
+                iaMsg.innerHTML = `<strong>AnubiBot:</strong> ${escapeHTML(replyText)}`;
                 history.appendChild(iaMsg);
-                history.scrollTop = history.scrollHeight;
-            }, 600);
+
+            } catch (error) {
+                console.error("Error conectando con la IA:", error);
+                const typingElem = document.getElementById('ai-typing');
+                if (typingElem) typingElem.remove();
+
+                const errorMsg = document.createElement('div');
+                errorMsg.style.marginBottom = '4px';
+                errorMsg.style.color = '#ff5555';
+                errorMsg.innerHTML = `<strong>AnubiBot:</strong> ¡Sin conexión con el servidor de AnubiSoft!`;
+                history.appendChild(errorMsg);
+            }
+
+            history.scrollTop = history.scrollHeight;
         }
     }
+}
+
+// Función auxiliar para evitar código malicioso en el chat
+function escapeHTML(str) {
+    return str.replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+    );
 }
