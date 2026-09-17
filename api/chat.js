@@ -1,5 +1,5 @@
 // =========================================================
-// api/chat.js - Modelo Llama 3.3 Versatile en Groq
+// api/chat.js - Modelo Oficial Activo en Groq
 // =========================================================
 
 export default async function handler(req, res) {
@@ -14,7 +14,7 @@ export default async function handler(req, res) {
   const API_KEY = process.env.GROQ_API_KEY;
 
   if (!API_KEY) {
-    return res.status(500).json({ reply: "¡Falta configurar GROQ_API_KEY en Vercel!" });
+    return res.status(500).json({ reply: "¡Falta GROQ_API_KEY en Vercel!" });
   }
 
   const defaultPrompt = `Eres AnubiBot, la IA oficial del portal AnubiSoft. 
@@ -29,7 +29,7 @@ Entiendes cualquier jerga o modismo actual, pero respondes corto, en español y 
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile", // El modelo oficial y activo de Groq
+        model: "openai/gpt-oss-20b", // Modelo activo ultrarrápido oficial de Groq
         messages: [
           { role: "system", content: systemPrompt || defaultPrompt },
           { role: "user", content: message || "Hola" }
@@ -42,7 +42,6 @@ Entiendes cualquier jerga o modismo actual, pero respondes corto, en español y 
     const data = await groqResponse.json();
 
     if (!groqResponse.ok) {
-      // Si rebotara, te muestra la razón exacta en el chat
       const detail = data?.error?.message || "Error de autenticación o modelo.";
       return res.status(200).json({ reply: `[Error Groq]: ${detail}` });
     }
