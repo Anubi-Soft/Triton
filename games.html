@@ -1,0 +1,55 @@
+<!-- MÓDULO DE JUEGOS Y CHAT RETRO (games.html) -->
+<div class="card text-center">
+    <h2>WLM Retro Mini-Game 🎮</h2>
+    
+    <!-- Selectores de Modo y Dificultad -->
+    <div class="controls-wrapper">
+        <div>
+            <label for="game-mode" class="label-sm">Modo: </label>
+            <select id="game-mode" class="select-style" onchange="onModeChange()">
+                <option value="pvp-local">2 Jugadores (Mismo Celular)</option>
+                <option value="pvp-online">2 Jugadores (Online P2P)</option>
+                <option value="pve">vs IA</option>
+            </select>
+        </div>
+
+        <div id="difficulty-container" class="hidden">
+            <label for="game-difficulty" class="label-sm">Dificultad: </label>
+            <select id="game-difficulty" class="select-style" onchange="resetGame()">
+                <option value="easy">😊 Fácil</option>
+                <option value="medium">😐 Medio</option>
+                <option value="hard">😈 Imbatible</option>
+            </select>
+        </div>
+    </div>
+
+    <p id="game-status">Turno de: Jugador X</p>
+    
+    <div class="board">
+        <div class="cell" onclick="makeMove(0)"></div>
+        <div class="cell" onclick="makeMove(1)"></div>
+        <div class="cell" onclick="makeMove(2)"></div>
+        <div class="cell" onclick="makeMove(3)"></div>
+        <div class="cell" onclick="makeMove(4)"></div>
+        <div class="cell" onclick="makeMove(5)"></div>
+        <div class="cell" onclick="makeMove(6)"></div>
+        <div class="cell" onclick="makeMove(7)"></div>
+        <div class="cell" onclick="makeMove(8)"></div>
+    </div>
+    
+    <button class="btn-reset" onclick="resetGame()">Reiniciar Partida</button>
+
+    <!-- Cuadro de Chat Retro MSN -->
+    <div class="chat-section">
+        <span class="chat-title">💬 Chat de la Sala</span>
+        
+        <div id="chat-history" class="chat-box">
+            <div class="chat-welcome">¡Bienvenido al chat! Hablá con tu rival...</div>
+        </div>
+
+        <div class="chat-input-wrapper">
+            <input type="text" id="chat-input" class="chat-input" placeholder="Escribí un mensaje..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <button class="btn-send" onclick="sendMessage()">Enviar</button>
+        </div>
+    </div>
+</div>
