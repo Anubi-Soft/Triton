@@ -127,11 +127,18 @@ async function sendMessage() {
     input.value = "";
 
     try {
-        const res = await fetch("/api/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: text, playerName: playerName })
-        });
+        // Reemplazá el fetch relativo por la URL absoluta de Vercel:
+const res = await fetch("https://triton-bxoj.vercel.app/api/chat", {
+    method: "POST",
+    headers: { 
+        "Content-Type": "application/json" 
+    },
+    body: JSON.stringify({ 
+        message: text, 
+        playerName: playerName 
+    })
+});
+
 
         // Si la ruta no existe (404) o falla (500)
         if (!res.ok) {
