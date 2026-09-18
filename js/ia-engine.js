@@ -1,63 +1,107 @@
 // =========================================================
-// js/ia-engine.js - Conexión con el Backend de Vercel
+// js/ia-engine.js - Algoritmo de decisión para Ta-Te-Ti
 // =========================================================
 
-// La URL de tu microservicio desplegado en Vercel
-const BACKEND_URL = "https://triton-bxoj.vercel.app/api/chat";
+function getAIMove(board, difficulty = "medium") {
+  const emptyIndices = board.map((val, idx) => val === "" ? idx : null).filter(val => val !== null);
+  if (emptyIndices.length === 0) return null;
 
-function escapeHTML(str) {
-  return str.replace(/[&<>'"]/g, 
-    tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-  );
+  // Fácil: Movimiento 100% Aleatorio
+  if (difficulty === "easy") {
+    return emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+  }
+
+  // Medio: Intenta ganar o bloquear al rival; si no, aleatorio
+  if (difficulty === "medium") {
+    const winMove = findWinningMove(board, "O");
+    if (winMove !== null) return winMove;
+
+    const blockMove = findWinningMove(board, "X");
+    if (blockMove !== null) return blockMove;
+
+    return emptyIndices[Math.floor(Math.random() * emptyIndices.length)];
+  }
+
+  // Imbatible: Algoritmo Minimax
+  if (difficulty === "hard") {
+    return minimax(board, "O").index;
+  }
+
+  return emptyIndices[0];
 }
 
-async function fetchAIResponse(userMessage, customPrompt = null) {
-  try {
-    const response = await fetch(BACKEND_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        message: userMessage,
-        systemPrompt: customPrompt
-      })
-    });
+function findWinningMove(board, player) {
+  const winConditions = [
+    [0,1,2], [3,4,5], [6,7,8],
+    [0,3,6], [1,4,7], [2,5,8],
+    [0,4,8], [2,4,6]
+  ];
 
-    if (!response.ok) {
-      throw new Error(`Error HTTP: ${response.status}`);
+  for (let condition of winConditions) {
+    const [a, b, c] = condition;
+    const line = [board[a], board[b], board[c]];
+    if (line.filter(val => val === player).length === 2 && line.includes("")) {
+      if (board[a] === "") return a;
+      if (board[b] === "") return b;
+      if (board[c] === "") return c;
+    }
+  }
+  return null;
+}
+
+function minimax(newBoard, player) {
+  const availSpots = newBoard.map((val, idx) => val === "" ? idx : null).filter(val => val !== null);
+
+  if (checkWinCondition(newBoard, "X")) return { score: -10 };
+  if (checkWinCondition(newBoard, "O")) return { score: 10 };
+  if (availSpots.length === 0) return { score: 0 };
+
+  const moves = [];
+
+  for (let i = 0; i < availSpots.length; i++) {
+    const move = {};
+    move.index = availSpots[i];
+    newBoard[availSpots[i]] = player;
+
+    if (player === "O") {
+      const result = minimax(newBoard, "X");
+      move.score = result.score;
+    } else {
+      const result = minimax(newBoard, "O");
+      move.score = result.score;
     }
 
-    const data = await response.json();
-    return data.reply || "¡Mi procesador retro tuvo un pequeño lag! 🎮";
-  } catch (error) {
-    console.error("Error al conectar con la IA:", error);
-    return "¡Se perdió la conexión con el servidor de AnubiSoft!";
+    newBoard[availSpots[i]] = "";
+    moves.push(move);
   }
+
+  let bestMove;
+  if (player === "O") {
+    let bestScore = -10000;
+    for (let i = 0; i < moves.length; i++) {
+      if (moves[i].score > bestScore) {
+        bestScore = moves[i].score;
+        bestMove = i;
+      }
+    }
+  } else {
+    let bestScore = 10000;
+    for (let i = 0; i < moves.length; i++) {
+      if (moves[i].score < bestScore) {
+        bestScore = moves[i].score;
+        bestMove = i;
+      }
+    }
+  }
+
+  return moves[bestMove];
 }
 
-// Disparador del Chat Retro en la vista del Juego
-async function triggerAIChatResponse(userText) {
-  const history = document.getElementById("chat-history");
-  if (!history) return;
-
-  // 1. Crear e insertar mensaje de "Escribiendo..."
-  const typingDiv = document.createElement("div");
-  typingDiv.id = "ai-typing";
-  typingDiv.style.marginBottom = "4px";
-  typingDiv.style.color = "#8b949e";
-  typingDiv.innerHTML = `<strong style="color: #00e5ff;">AnubiBot:</strong> <i>Escribiendo...</i>`;
-  history.appendChild(typingDiv);
-  history.scrollTop = history.scrollHeight;
-
-  // 2. Hacer la petición al Microservicio en Vercel
-  const responseText = await fetchAIResponse(userText);
-
-  // 3. Eliminar "Escribiendo..." y mostrar la respuesta de Llama 3
-  const typingElem = document.getElementById("ai-typing");
-  if (typingElem) typingElem.remove();
-
-  const msgDiv = document.createElement("div");
-  msgDiv.style.marginBottom = "4px";
-  msgDiv.innerHTML = `<strong style="color: #00e5ff;">AnubiBot:</strong> ${escapeHTML(responseText)}`;
-  history.appendChild(msgDiv);
-  history.scrollTop = history.scrollHeight;
+function checkWinCondition(board, player) {
+  const winConditions = [
+    [0,1,2], [3,4,5], [6,7,8],
+    [0,3,6], [1,4,7], [2,5,8],
+    [0,4,8], [2,4,6]
+  ];
+  return winConditions.some(([a, b, c]) => board[a] === player && board[b] === player && board[c] === player);
 }
