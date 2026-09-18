@@ -111,64 +111,95 @@ function onModeChange() {
 /* =========================================================
    Sistema de Chat Retro conectado a Vercel / Groq API
    ========================================================= */
+// URL de tu microservicio en Vercel
+const BACKEND_URL = "https://triton-bxoj.vercel.app/api/chat";
+
+// Chat Inteligente conectado a Vercel / Llama 3
 async function sendMessage() {
-    const input = document.getElementById("chat-input");
-    const history = document.getElementById("chat-history");
-    const nameInput = document.getElementById("player-name");
-    
-    const text = input ? input.value.trim() : "";
-    const playerName = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : "Jugador";
+    const input = document.getElementById('chat-input');
+    const history = document.getElementById('chat-history');
+    const rawText = input.value.trim();
+    const text = rawText.toLowerCase();
+    const mode = document.getElementById('game-mode').value;
 
-    if (!text) return;
+    if (text !== '') {
+        // 1. Mostrar mensaje del usuario
+        const msg = document.createElement('div');
+        msg.style.marginBottom = '4px';
+        msg.innerHTML = `<strong>Tú:</strong> ${escapeHTML(rawText)}`;
+        history.appendChild(msg);
+        input.value = '';
+        history.scrollTop = history.scrollHeight;
 
-    appendChatMessage(playerName, text);
-    input.value = "";
-
-    try {
-        const res = await fetch("/api/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: text, playerName: playerName })
-        });
-
-        // Si la ruta no existe (404) o falla (500)
-        if (!res.ok) {
-            appendChatMessage("AnubiBot", `[Error Status ${res.status}]: Revisa la ruta /api/chat en Vercel.`);
-            return;
-        }
-
-        const data = await res.json();
-        let reply = data.reply || "Sin respuesta del servidor.";
-
-                if (reply.includes("[ACTION:START]")) {
-            reply = reply.replace("[ACTION:START]", "").trim();
-            resetGame();
-            
-            // Verificar si el motor de la IA está cargado antes de llamar a getAIMove
-            if (typeof getAIMove === "function") {
-                const diffElem = document.getElementById("game-difficulty");
-                const diff = diffElem ? diffElem.value : "medium";
-                const aiMove = getAIMove(boardState, diff);
-                if (aiMove !== null) {
-                    boardState[aiMove] = "O";
-                    updateBoardUI();
-                    currentPlayer = "X";
+        // Lógica de comandos especiales del juego (si querés que empiece la IA)
+        if (mode === 'pve') {
+            if (text.includes('empeza vos') || text.includes('empezá vos') || text.includes('inicia vos') || text.includes('comenza vos')) {
+                if (board.every(cell => cell === '')) {
+                    turn = 'O';
+                    const difficulty = document.getElementById('game-difficulty') ? document.getElementById('game-difficulty').value : 'easy';
+                    let aiMove = IAEngine.getBestMove(board, 'O', 'X', difficulty);
+                    if (aiMove !== null) {
+                        executeMove(aiMove, 'O');
+                    }
                 }
-            } else {
-                console.warn("ia-engine.js aún no está cargado.");
             }
-        } else if (reply.includes("[ACTION:RESTART]")) {
-            reply = reply.replace("[ACTION:RESTART]", "").trim();
-            resetGame();
+
+            // 2. Mostrar indicador de "Escribiendo..."
+            const typingMsg = document.createElement('div');
+            typingMsg.id = 'ai-typing';
+            typingMsg.style.marginBottom = '4px';
+            typingMsg.style.color = 'var(--accent-color, #00e5ff)';
+            typingMsg.innerHTML = `<strong>AnubiBot:</strong> <i>Escribiendo...</i>`;
+            history.appendChild(typingMsg);
+            history.scrollTop = history.scrollHeight;
+
+            try {
+                // 3. Petición a tu API en Vercel
+                const response = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: rawText })
+                });
+
+                const data = await response.json();
+                
+                // 4. Remover "Escribiendo..."
+                const typingElem = document.getElementById('ai-typing');
+                if (typingElem) typingElem.remove();
+
+                // 5. Mostrar respuesta de la IA
+                const iaMsg = document.createElement('div');
+                iaMsg.style.marginBottom = '4px';
+                iaMsg.style.color = 'var(--accent-color, #00e5ff)';
+                
+                const replyText = data.reply || "¡Ups, tuve un micro-lag en mis circuitos retro!";
+                iaMsg.innerHTML = `<strong>AnubiBot:</strong> ${escapeHTML(replyText)}`;
+                history.appendChild(iaMsg);
+
+            } catch (error) {
+                console.error("Error conectando con la IA:", error);
+                const typingElem = document.getElementById('ai-typing');
+                if (typingElem) typingElem.remove();
+
+                const errorMsg = document.createElement('div');
+                errorMsg.style.marginBottom = '4px';
+                errorMsg.style.color = '#ff5555';
+                errorMsg.innerHTML = `<strong>AnubiBot:</strong> ¡Sin conexión con el servidor de AnubiSoft!`;
+                history.appendChild(errorMsg);
+            }
+
+            history.scrollTop = history.scrollHeight;
         }
-
-
-        appendChatMessage("AnubiBot", reply);
-
-    } catch (err) {
-        appendChatMessage("AnubiBot", `[Error Catch]: ${err.message}`);
     }
 }
+
+// Función auxiliar para evitar código malicioso en el chat
+function escapeHTML(str) {
+    return str.replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+    );
+}
+
 
 function appendChatMessage(sender, text) {
     const history = document.getElementById("chat-history");
