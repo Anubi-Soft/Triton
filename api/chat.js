@@ -39,7 +39,7 @@ Responde de forma concisa, divertida y en español Latino.`;
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        model: "openai/gpt-oss-20b",
         messages: [
           { role: "system", content: systemPrompt || defaultPrompt },
           { role: "user", content: message || "Hola" }
