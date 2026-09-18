@@ -1,11 +1,12 @@
 // =========================================================
-// js/game-logic.js - Lógica del Juego + Conexión IA Serverless
+// js/game-logic.js - Gestión del Tablero y Chat Retro
 // =========================================================
 
 let boardState = ["", "", "", "", "", "", "", "", ""];
 let currentPlayer = "X";
 let isGameActive = true;
 
+// Mover en el tablero
 function makeMove(index) {
     if (boardState[index] !== "" || !isGameActive) return;
 
@@ -14,40 +15,48 @@ function makeMove(index) {
 
     if (checkWinner()) return;
 
-    const mode = document.getElementById("game-mode") ? document.getElementById("game-mode").value : "pvp-local";
+    const modeElem = document.getElementById("game-mode");
+    const mode = modeElem ? modeElem.value : "pvp-local";
 
     if (mode === "pve" && currentPlayer === "X") {
         currentPlayer = "O";
-        const statusElem = document.getElementById("game-status");
-        if (statusElem) statusElem.innerText = "Turno de: IA (O)";
-        isGameActive = false; // Bloquea clicks mientras piensa
+        updateStatus("Turno de: IA (O)");
+        isGameActive = false; // Bloquea clics del usuario mientras la IA procesa
 
         setTimeout(() => {
-            const diffElem = document.getElementById("game-difficulty");
-            const diff = diffElem ? diffElem.value : "medium";
-            const aiMove = getAIMove(boardState, diff);
-            if (aiMove !== null) {
-                boardState[aiMove] = "O";
-                updateBoardUI();
-                if (!checkWinner()) {
-                    currentPlayer = "X";
-                    if (statusElem) statusElem.innerText = "Turno de: Jugador X";
-                    isGameActive = true;
-                }
-            }
+            executeAIMove();
         }, 400);
     } else if (mode === "pvp-local") {
         currentPlayer = currentPlayer === "X" ? "O" : "X";
-        const statusElem = document.getElementById("game-status");
-        if (statusElem) statusElem.innerText = `Turno de: Jugador ${currentPlayer}`;
+        updateStatus(`Turno de: Jugador ${currentPlayer}`);
+    }
+}
+
+function executeAIMove() {
+    const diffElem = document.getElementById("game-difficulty");
+    const diff = diffElem ? diffElem.value : "medium";
+
+    if (typeof getAIMove === "function") {
+        const aiChoice = getAIMove(boardState, diff);
+        if (aiChoice !== null && aiChoice !== undefined) {
+            boardState[aiChoice] = "O";
+            updateBoardUI();
+            if (!checkWinner()) {
+                currentPlayer = "X";
+                updateStatus("Turno de: Jugador X");
+                isGameActive = true;
+            }
+        }
     }
 }
 
 function updateBoardUI() {
     const cells = document.querySelectorAll(".cell");
     cells.forEach((cell, idx) => {
-        cell.innerText = boardState[idx];
-        cell.className = `cell ${boardState[idx].toLowerCase()}`;
+        if (cell) {
+            cell.innerText = boardState[idx];
+            cell.className = `cell ${boardState[idx].toLowerCase()}`;
+        }
     });
 }
 
@@ -61,16 +70,14 @@ function checkWinner() {
     for (let condition of winConditions) {
         const [a, b, c] = condition;
         if (boardState[a] && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
-            const statusElem = document.getElementById("game-status");
-            if (statusElem) statusElem.innerText = `¡Ganador: Jugador ${boardState[a]}! 🎉`;
+            updateStatus(`¡Ganador: Jugador ${boardState[a]}! 🎉`);
             isGameActive = false;
             return true;
         }
     }
 
     if (!boardState.includes("")) {
-        const statusElem = document.getElementById("game-status");
-        if (statusElem) statusElem.innerText = "¡Empate! 🤝";
+        updateStatus("¡Empate! 🤝");
         isGameActive = false;
         return true;
     }
@@ -82,15 +89,13 @@ function resetGame() {
     boardState = ["", "", "", "", "", "", "", "", ""];
     currentPlayer = "X";
     isGameActive = true;
-    
+    updateStatus("Turno de: Jugador X");
+    updateBoardUI();
+}
+
+function updateStatus(text) {
     const statusElem = document.getElementById("game-status");
-    if (statusElem) {
-        statusElem.innerText = "Turno de: Jugador X";
-    }
-    
-    if (document.querySelector(".cell")) {
-        updateBoardUI();
-    }
+    if (statusElem) statusElem.innerText = text;
 }
 
 function onModeChange() {
@@ -98,26 +103,24 @@ function onModeChange() {
     const diffContainer = document.getElementById("difficulty-container");
     if (modeElem && diffContainer) {
         if (modeElem.value === "pve") {
-            diffContainer.classList.remove("hidden");
             diffContainer.style.display = "block";
+            diffContainer.classList.remove("hidden");
         } else {
-            diffContainer.classList.add("hidden");
             diffContainer.style.display = "none";
+            diffContainer.classList.add("hidden");
         }
     }
     resetGame();
 }
 
-/* =========================================================
-   Sistema de Chat Retro conectado a Vercel / Groq API
-   ========================================================= */
-// URL de tu microservicio en Vercel
+// =========================================================
+// Envió de Mensajes y Control Dinámico desde el Chat
+// =========================================================
 
 async function sendMessage() {
     const input = document.getElementById("chat-input");
-    const history = document.getElementById("chat-history");
     const nameInput = document.getElementById("player-name");
-    
+
     const text = input ? input.value.trim() : "";
     const playerName = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : "Jugador";
 
@@ -127,61 +130,66 @@ async function sendMessage() {
     input.value = "";
 
     try {
-        // Reemplazá el fetch relativo por la URL absoluta de Vercel:
-const res = await fetch("https://triton-bxoj.vercel.app/api/chat", {
-    method: "POST",
-    headers: { 
-        "Content-Type": "application/json" 
-    },
-    body: JSON.stringify({ 
-        message: text, 
-        playerName: playerName 
-    })
-});
+        const res = await fetch("https://triton-bxoj.vercel.app/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: text, playerName: playerName })
+        });
 
-
-        // Si la ruta no existe (404) o falla (500)
         if (!res.ok) {
-            appendChatMessage("AnubiBot", `[Error Status ${res.status}]: Revisa la ruta /api/chat en Vercel.`);
+            appendChatMessage("AnubiBot", `[Error ${res.status}]: Falló la respuesta de Vercel.`);
             return;
         }
 
         const data = await res.json();
-        let reply = data.reply || "Sin respuesta del servidor.";
+        let reply = data.reply || "...";
 
-        if (reply.includes("[ACTION:START]")) {
-            reply = reply.replace("[ACTION:START]", "").trim();
-            resetGame();
-            const modeElem = document.getElementById("game-mode");
-            if (modeElem && modeElem.value === "pve") {
-                const diffElem = document.getElementById("game-difficulty");
-                const diff = diffElem ? diffElem.value : "medium";
-                const aiMove = getAIMove(boardState, diff);
-                if (aiMove !== null) {
-                    boardState[aiMove] = "O";
-                    updateBoardUI();
-                }
-            }
-        } else if (reply.includes("[ACTION:RESTART]")) {
-            reply = reply.replace("[ACTION:RESTART]", "").trim();
-            resetGame();
-        }
+        // Detección de Acciones devueltas por la IA
+        const hasSwitchVS = reply.includes("[ACTION:SWITCH_VS_AI]");
+        const hasAIFirst = reply.includes("[ACTION:START_AI_FIRST]");
+        const hasUserFirst = reply.includes("[ACTION:START_USER_FIRST]");
+
+        // Limpiar las etiquetas del texto a mostrar en el chat
+        reply = reply
+            .replace("[ACTION:SWITCH_VS_AI]", "")
+            .replace("[ACTION:START_AI_FIRST]", "")
+            .replace("[ACTION:START_USER_FIRST]", "")
+            .trim();
 
         appendChatMessage("AnubiBot", reply);
 
+        // Cambiar a modo vs IA si la orden viene de la conversación
+        if (hasSwitchVS || hasAIFirst || hasUserFirst) {
+            switchToPVE();
+            if (hasAIFirst) {
+                resetGame();
+                currentPlayer = "O";
+                updateStatus("Turno de: IA (O)");
+                isGameActive = false;
+                setTimeout(() => executeAIMove(), 500);
+            } else if (hasUserFirst) {
+                resetGame();
+            }
+        }
+
     } catch (err) {
-        appendChatMessage("AnubiBot", `[Error Catch]: ${err.message}`);
+        appendChatMessage("AnubiBot", `[Error Conexión]: ${err.message}`);
     }
 }
 
+function switchToPVE() {
+    const modeElem = document.getElementById("game-mode");
+    if (modeElem && modeElem.value !== "pve") {
+        modeElem.value = "pve";
+        onModeChange();
+    }
+}
 
-// Función auxiliar para evitar código malicioso en el chat
 function escapeHTML(str) {
     return str.replace(/[&<>'"]/g, 
         tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
     );
 }
-
 
 function appendChatMessage(sender, text) {
     const history = document.getElementById("chat-history");
@@ -193,13 +201,7 @@ function appendChatMessage(sender, text) {
     const isBot = sender === "AnubiBot";
     const color = isBot ? "#00A2ED" : "var(--accent-color, #00ffcc)";
 
-    msgDiv.innerHTML = `<strong style="color: ${color};">${sender}:</strong> ${escapeHTML(text)}`;
+    msgDiv.innerHTML = `<strong style="color: ${color};">${escapeHTML(sender)}:</strong> ${escapeHTML(text)}`;
     history.appendChild(msgDiv);
     history.scrollTop = history.scrollHeight;
-}
-
-function escapeHTML(str) {
-    return str.replace(/[&<>'"]/g, 
-        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-    );
 }
