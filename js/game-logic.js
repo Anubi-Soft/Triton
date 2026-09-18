@@ -140,23 +140,28 @@ async function sendMessage() {
         const data = await res.json();
         let reply = data.reply || "Sin respuesta del servidor.";
 
-        if (reply.includes("[ACTION:START]")) {
+                if (reply.includes("[ACTION:START]")) {
             reply = reply.replace("[ACTION:START]", "").trim();
             resetGame();
-            const modeElem = document.getElementById("game-mode");
-            if (modeElem && modeElem.value === "pve") {
+            
+            // Verificar si el motor de la IA está cargado antes de llamar a getAIMove
+            if (typeof getAIMove === "function") {
                 const diffElem = document.getElementById("game-difficulty");
                 const diff = diffElem ? diffElem.value : "medium";
                 const aiMove = getAIMove(boardState, diff);
                 if (aiMove !== null) {
                     boardState[aiMove] = "O";
                     updateBoardUI();
+                    currentPlayer = "X";
                 }
+            } else {
+                console.warn("ia-engine.js aún no está cargado.");
             }
         } else if (reply.includes("[ACTION:RESTART]")) {
             reply = reply.replace("[ACTION:RESTART]", "").trim();
             resetGame();
         }
+
 
         appendChatMessage("AnubiBot", reply);
 
