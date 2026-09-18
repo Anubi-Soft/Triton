@@ -121,29 +121,32 @@ async function sendMessage() {
 
     if (!text) return;
 
-    // 1. Mostrar mensaje del usuario en pantalla
     appendChatMessage(playerName, text);
     input.value = "";
 
     try {
-        // 2. Enviar a nuestra Serverless Function de Vercel
         const res = await fetch("/api/chat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message: text, playerName: playerName })
         });
 
+        // Si la ruta no existe (404) o falla (500)
+        if (!res.ok) {
+            appendChatMessage("AnubiBot", `[Error Status ${res.status}]: Revisa la ruta /api/chat en Vercel.`);
+            return;
+        }
+
         const data = await res.json();
         let reply = data.reply || "Sin respuesta del servidor.";
 
-        // 3. Procesar acciones que solicita la IA
         if (reply.includes("[ACTION:START]")) {
             reply = reply.replace("[ACTION:START]", "").trim();
             resetGame();
-            // Si el modo es vs IA, forzamos la primera jugada de la IA
-            const mode = document.getElementById("game-mode") ? document.getElementById("game-mode").value : "pvp-local";
-            if (mode === "pve") {
-                const diff = document.getElementById("game-difficulty") ? document.getElementById("game-difficulty").value : "medium";
+            const modeElem = document.getElementById("game-mode");
+            if (modeElem && modeElem.value === "pve") {
+                const diffElem = document.getElementById("game-difficulty");
+                const diff = diffElem ? diffElem.value : "medium";
                 const aiMove = getAIMove(boardState, diff);
                 if (aiMove !== null) {
                     boardState[aiMove] = "O";
@@ -155,11 +158,10 @@ async function sendMessage() {
             resetGame();
         }
 
-        // 4. Mostrar respuesta limpia de AnubiBot
         appendChatMessage("AnubiBot", reply);
 
     } catch (err) {
-        appendChatMessage("AnubiBot", "¡Uff, problemas en la conexión retro!");
+        appendChatMessage("AnubiBot", `[Error Catch]: ${err.message}`);
     }
 }
 
