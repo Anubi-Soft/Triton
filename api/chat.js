@@ -1,9 +1,8 @@
 // =========================================================
-// api/chat.js - Fix Error 405 (CORS & OPTIONS Handling)
+// api/chat.js - Modelo activado correctamente
 // =========================================================
 
 export default async function handler(req, res) {
-  // Configuración de cabeceras CORS
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -12,12 +11,10 @@ export default async function handler(req, res) {
     'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
   );
 
-  // Manejar solicitud preflight (OPTIONS)
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
-  // Validar que solo acepte POST
   if (req.method !== 'POST') {
     return res.status(405).json({ error: `Método ${req.method} no permitido.` });
   }
@@ -48,7 +45,7 @@ REGLAS DE ACCIÓN:
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        model: "openai/gpt-oss-20b", // <-- Modelo ultrarrápido y garantizado en Groq
         messages: [
           { role: "system", content: systemPrompt || defaultPrompt },
           { role: "user", content: message || "Hola" }
