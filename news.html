@@ -1,0 +1,22 @@
+<!-- news.html -->
+<div class="news-module">
+  <div id="news-list-view" class="news-view">
+    
+    <div class="news-header">
+      <h2 class="news-main-title">Novedades y Actualizaciones</h2>
+      <p class="news-subtitle">Últimos avances sobre el desarrollo de AnubiSoft y proyectos retro</p>
+    </div>
+
+    <!-- ¡ESTE ID TIENE QUE LLAMARSE EXACTAMENTE ASÍ! -->
+    <div id="news-grid-container" class="news-grid"></div>
+
+  </div>
+
+  <!-- Vista detalle oculta por defecto -->
+  <div id="news-detail-view" class="news-view" style="display: none;">
+    <button class="btn-back-news" onclick="goBackToNewsList()">
+      <span class="back-arrow">←</span> Volver a Novedades
+    </button>
+    <article id="news-article-content" class="news-article-detail"></article>
+  </div>
+</div>
