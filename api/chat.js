@@ -1,17 +1,28 @@
 // =========================================================
-// api/chat.js - Control Inteligente del Juego
+// api/chat.js - Fix Error 405 (CORS & OPTIONS Handling)
 // =========================================================
 
 export default async function handler(req, res) {
+  // Configuración de cabeceras CORS
+  res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+  );
 
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Método no permitido' });
+  // Manejar solicitud preflight (OPTIONS)
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
 
-  // Recibimos mensaje y nombre del jugador
-  const { message, playerName, systemPrompt } = req.body;
+  // Validar que solo acepte POST
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: `Método ${req.method} no permitido.` });
+  }
+
+  const { message, playerName, systemPrompt } = req.body || {};
   const API_KEY = process.env.GROQ_API_KEY;
 
   if (!API_KEY) {
@@ -37,7 +48,7 @@ REGLAS DE ACCIÓN:
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "openai/gpt-oss-20b",
+        model: "llama-3.3-70b-versatile",
         messages: [
           { role: "system", content: systemPrompt || defaultPrompt },
           { role: "user", content: message || "Hola" }
