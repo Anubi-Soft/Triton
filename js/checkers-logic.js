@@ -113,8 +113,13 @@ function switchTurn() {
     turn = (turn === 'R') ? 'B' : 'R';
     updateCheckersStatus();
     renderBoard();
+
+    // Si terminó el juego, no dispara el turno de la IA
+    if (checkGameOver()) return;
+
     checkAITurn();
 }
+
 
 function checkAITurn() {
     const modeElem = document.getElementById('game-mode');
@@ -203,6 +208,69 @@ window.onResetGame = function() {
 window.onGameModeChange = function(mode, difficulty) {
     initCheckers();
 };
+
+// =========================================================
+// Manejo de Fin de Juego y Mensaje del Bot
+// =========================================================
+
+function checkGameOver() {
+    const pveMode = document.getElementById('game-mode')?.value === 'pve';
+    const playerName = getPlayerName();
+
+    // Contar si le quedan movimientos a cada bando
+    const redMoves = getValidMovesForColor('R');
+    const blackMoves = getValidMovesForColor('B');
+
+    if (redMoves.length === 0) {
+        isGameActive = false;
+        const winner = (userColor === 'B') ? playerName : "AnubiBot";
+        updateStatus(`¡Sin movimientos! Ganador: ${winner}`);
+        
+        if (pveMode) {
+            if (userColor === 'B') {
+                appendChatMessage("AnubiBot", `¡Increíble estrategia, ${playerName}! 🏆 Bloqueaste todas mis fichas rojas. ¡Muy buena partida!`);
+            } else {
+                appendChatMessage("AnubiBot", `¡Punto para AnubiBot! 🤖 Buen intento, ${playerName}. ¿Echamos la revancha?`);
+            }
+        }
+        return true;
+    }
+
+    if (blackMoves.length === 0) {
+        isGameActive = false;
+        const winner = (userColor === 'R') ? playerName : "AnubiBot";
+        updateStatus(`¡Sin movimientos! Ganador: ${winner}`);
+
+        if (pveMode) {
+            if (userColor === 'R') {
+                appendChatMessage("AnubiBot", `¡Felicitaciones, ${playerName}! 🎉 Te quedaste con todo el tablero. ¿Jugamos otra?`);
+            } else {
+                appendChatMessage("AnubiBot", `¡Ganó la IA! 🤖 Me he dejado llevar por la victoria, ${playerName}. ¡Probemos de nuevo!`);
+            }
+        }
+        return true;
+    }
+
+    return false;
+}
+
+// Auxiliar para obtener movimientos válidos por color
+function getValidMovesForColor(color) {
+    const moves = [];
+    for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+            if (board[r][c] === color) {
+                const targetRow = (color === 'B') ? r + 1 : r - 1;
+                if (targetRow >= 0 && targetRow < 8) {
+                    if (c - 1 >= 0 && board[targetRow][c - 1] === '') moves.push(1);
+                    if (c + 1 < 8 && board[targetRow][c + 1] === '') moves.push(1);
+                }
+            }
+        }
+    }
+    return moves;
+}
+
 
 // Iniciar al cargar la página
 document.addEventListener("DOMContentLoaded", initCheckers);
