@@ -142,35 +142,59 @@ async function sendMessage() {
         }
 
         const data = await res.json();
-        let reply = data.reply || "...";
+let reply = data.reply || "...";
 
-        // Detección de Acciones devueltas por la IA
-        const hasSwitchVS = reply.includes("[ACTION:SWITCH_AI]");
-const hasAIFirst = reply.includes("[ACTION:START_AI]");
-const hasUserFirst = reply.includes("[ACTION:START_USER]");
+// 1. Detectamos todas las acciones posibles
+const hasSwitchVS     = reply.includes("[ACTION:SWITCH_AI]");
+const hasAIFirst      = reply.includes("[ACTION:START_AI]");
+const hasUserFirst    = reply.includes("[ACTION:START_USER]");
+const hasChangeSideX  = reply.includes("[ACTION:CHANGE_SIDE_X]");
+const hasChangeSideO  = reply.includes("[ACTION:CHANGE_SIDE_O]");
 
-reply = reply
+// 2. Limpiamos TODAS las etiquetas ANTES de imprimir en el chat
+let cleanReply = reply
     .replace("[ACTION:SWITCH_AI]", "")
     .replace("[ACTION:START_AI]", "")
     .replace("[ACTION:START_USER]", "")
+    .replace("[ACTION:CHANGE_SIDE_X]", "")
+    .replace("[ACTION:CHANGE_SIDE_O]", "")
     .trim();
 
+// 3. Imprimimos la respuesta limpia
+appendChatMessage("AnubiBot", cleanReply);
 
-        appendChatMessage("AnubiBot", reply);
+// 4. Ejecutamos los cambios en el juego
+if (hasSwitchVS || hasAIFirst || hasUserFirst || hasChangeSideX || hasChangeSideO) {
+    switchToPVE(); // Asegura que esté en modo Vs IA
 
-        // Cambiar a modo vs IA si la orden viene de la conversación
-        if (hasSwitchVS || hasAIFirst || hasUserFirst) {
-            switchToPVE();
-            if (hasAIFirst) {
-                resetGame();
-                currentPlayer = "O";
-                updateStatus("Turno de: IA (O)");
-                isGameActive = false;
-                setTimeout(() => executeAIMove(), 500);
-            } else if (hasUserFirst) {
-                resetGame();
-            }
-        }
+    if (hasChangeSideX) {
+        // El usuario pasa a ser X, por ende la IA pasa a ser O y empieza el usuario
+        resetGame();
+        playerSymbol = "X"; 
+        aiSymbol = "O";
+        updateStatus(`Ahora eres 'X'. Turno de: ${playerName}`);
+    } 
+    else if (hasChangeSideO) {
+        // El usuario pasa a ser O, la IA pasa a ser X y arranca la IA
+        resetGame();
+        playerSymbol = "O";
+        aiSymbol = "X";
+        currentPlayer = "X";
+        updateStatus("Ahora eres 'O'. Turno de: AnubiBot (X)");
+        isGameActive = false;
+        setTimeout(() => executeAIMove(), 500);
+    }
+    else if (hasAIFirst) {
+        resetGame();
+        currentPlayer = aiSymbol;
+        updateStatus(`Turno de: AnubiBot (${aiSymbol})`);
+        isGameActive = false;
+        setTimeout(() => executeAIMove(), 500);
+    } 
+    else if (hasUserFirst) {
+        resetGame();
+    }
+}
 
     } catch (err) {
         appendChatMessage("AnubiBot", `[Error Conexión]: ${err.message}`);
