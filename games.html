@@ -1,53 +1,45 @@
-<!-- MÓDULO DE JUEGOS Y CHAT RETRO (games.html) -->
-<div class="card text-center">
-    <h2>WLM Retro Mini-Game 🎮</h2>
+<!-- CONTENEDOR PRINCIPAL: SALA DE JUEGOS -->
+<div class="main-workspace">
     
-    <!-- Selectores de Modo y Dificultad -->
-    <div class="controls-wrapper">
-        <div>
-            <label for="game-mode" class="label-sm">Modo: </label>
-            <select id="game-mode" class="select-style" onchange="onModeChange()">
-                <option value="pvp-local">2 Jugadores (Mismo Celular)</option>
-                <option value="pvp-online">2 Jugadores (Online P2P)</option>
-                <option value="pve">vs IA</option>
-            </select>
+    <!-- ÁREA SUPERIOR: REPRODUCTOR DE JUEGOS Y CAJÓN -->
+    <div class="game-viewport" id="game-viewport">
+        
+        <!-- Botón de Navegación (Visible solo cuando hay un juego abierto) -->
+        <button id="btn-back" class="btn-retro hidden" onclick="closeGame()">
+            ⬅️ Volver al Menú
+        </button>
+
+        <!-- CAJÓN DE JUEGOS (Se superpone tipo App Drawer) -->
+        <div id="app-drawer" class="app-drawer">
+            <h3 class="drawer-title">🎮 Galería de Minijuegos</h3>
+            <div class="games-grid">
+                <!-- Tarjeta de Tateti -->
+                <div class="game-card" onclick="launchGame('tateti.html')">
+                    <div class="game-icon">❌⭕</div>
+                    <span>Ta-Te-Ti AI</span>
+                </div>
+                
+                <!-- Próximos juegos -->
+                <div class="game-card locked">
+                    <div class="game-icon">🐍</div>
+                    <span>Próximamente</span>
+                </div>
+            </div>
         </div>
 
-        <div id="difficulty-container" class="hidden" style="display: none;">
-            <label for="game-difficulty" class="label-sm">Dificultad: </label>
-            <select id="game-difficulty" class="select-style" onchange="resetGame()">
-                <option value="easy">😊 Fácil</option>
-                <option value="medium">😐 Medio</option>
-                <option value="hard">😈 Imbatible</option>
-            </select>
-        </div>
+        <!-- Marco donde se renderiza el juego cargado -->
+        <iframe id="game-frame" class="game-frame hidden" src="about:blank"></iframe>
     </div>
 
-    <p id="game-status">Turno de: Jugador X</p>
-    
-    <div class="board">
-        <div class="cell" onclick="makeMove(0)"></div>
-        <div class="cell" onclick="makeMove(1)"></div>
-        <div class="cell" onclick="makeMove(2)"></div>
-        <div class="cell" onclick="makeMove(3)"></div>
-        <div class="cell" onclick="makeMove(4)"></div>
-        <div class="cell" onclick="makeMove(5)"></div>
-        <div class="cell" onclick="makeMove(6)"></div>
-        <div class="cell" onclick="makeMove(7)"></div>
-        <div class="cell" onclick="makeMove(8)"></div>
-    </div>
-    
-    <button class="btn-reset" onclick="resetGame()">Reiniciar Partida</button>
-
-    <!-- Cuadro de Chat Retro MSN -->
+    <!-- ÁREA INFERIOR: CHAT COMPARTIDO (Siempre activo) -->
     <div class="chat-section">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <div class="chat-header">
             <span class="chat-title">💬 Chat de la Sala</span>
-            <input type="text" id="player-name" class="select-style" style="width: 110px; font-size: 12px; padding: 3px 6px;" placeholder="Tu Nick..." value="Jugador">
+            <input type="text" id="player-name" class="select-style cyan-placeholder" placeholder="Aquí tu Nick...">
         </div>
         
         <div id="chat-history" class="chat-box">
-            <div class="chat-welcome">¡Bienvenido al chat! Hablá con tu rival...</div>
+            <div class="chat-welcome">¡Bienvenido! Elegí un juego arriba o charlá con AnubiBot...</div>
         </div>
 
         <div class="chat-input-wrapper">
@@ -55,4 +47,5 @@
             <button class="btn-send" onclick="sendMessage()">Enviar</button>
         </div>
     </div>
+
 </div>
