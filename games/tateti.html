@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../../styles.css">
 </head>
 <body style="background: transparent; padding: 10px;">
 
@@ -13,7 +13,7 @@
         <div class="controls-wrapper">
             <div>
                 <label for="game-mode" class="label-sm">Modo: </label>
-                <select id="game-mode" class="select-style" onchange="parent.onModeChange ? parent.onModeChange() : onModeChange()">
+                <select id="game-mode" class="select-style" onchange="onModeChange()">
                     <option value="pvp-local">2 Jugadores (Mismo Celular)</option>
                     <option value="pvp-online">2 Jugadores (Online P2P)</option>
                     <option value="pve">vs IA</option>
@@ -47,8 +47,8 @@
         <button class="btn-reset" onclick="resetGame()">Reiniciar Partida</button>
     </div>
 
-    <!-- Scripts de la lógica del juego -->
-    <script src="js/ai-logic.js"></script>
-    <script src="js/game-logic.js"></script>
+    <!-- Scripts desde la carpeta raíz -->
+    <script src="../../js/ia-engine.js"></script>
+    <script src="../../js/game-logic.js"></script>
 </body>
 </html>
