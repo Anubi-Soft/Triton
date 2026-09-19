@@ -205,3 +205,34 @@ function appendChatMessage(sender, text) {
     history.appendChild(msgDiv);
     history.scrollTop = history.scrollHeight;
 }
+// =========================================================
+// Auto-Scroll al enfocar la caja de texto en celulares
+// =========================================================
+
+const chatInput = document.getElementById("chat-input");
+
+if (chatInput) {
+    // Cuando el usuario toca para escribir
+    chatInput.addEventListener("focus", () => {
+        setTimeout(() => {
+            // Desplaza la pantalla suavemente hacia la caja de texto
+            chatInput.scrollIntoView({ behavior: "smooth", block: "center" });
+            
+            // Si el historial del chat está presente, lo lleva al último mensaje
+            const history = document.getElementById("chat-history");
+            if (history) {
+                history.scrollTop = history.scrollHeight;
+            }
+        }, 300); // 300ms le da tiempo al teclado de Android/iOS para desplegarse
+    });
+}
+
+// Soporte nativo para navegadores con Visual Viewport (Chrome Mobile)
+if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", () => {
+        const activeElem = document.activeElement;
+        if (activeElem && activeElem.id === "chat-input") {
+            activeElem.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+    });
+                   }
