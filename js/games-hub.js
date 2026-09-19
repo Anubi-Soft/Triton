@@ -1,9 +1,9 @@
 // =========================================================
-// js/games-hub.js - Control del Cajón e Iframe (Delegado)
+// js/games-hub.js - Control Global de Minijuegos
 // =========================================================
 
-window.launchGame = function(gameUrl) {
-    console.log("Cargando juego:", gameUrl);
+function launchGame(gameUrl) {
+    console.log("Cargando juego en iframe:", gameUrl);
     
     const drawer = document.getElementById('app-drawer');
     const frame = document.getElementById('game-frame');
@@ -15,10 +15,10 @@ window.launchGame = function(gameUrl) {
         frame.classList.remove('hidden');
     }
     if (btnBack) btnBack.classList.remove('hidden');
-};
+}
 
-window.closeGame = function() {
-    console.log("Cerrando juego y volviendo al menú");
+function closeGame() {
+    console.log("Cerrando juego...");
     
     const drawer = document.getElementById('app-drawer');
     const frame = document.getElementById('game-frame');
@@ -30,23 +30,23 @@ window.closeGame = function() {
     }
     if (drawer) drawer.classList.remove('hidden');
     if (btnBack) btnBack.classList.add('hidden');
-};
+}
 
-// Delegación global de clics para atrapar los botones sin importar el fetch
+// Delegación de eventos global
 document.addEventListener("click", function(event) {
-    // Si hace clic en la tarjeta de Tateti (o cualquier elemento dentro de ella)
-    const tatetiCard = event.target.closest('#btn-tateti');
-    if (tatetiCard) {
+    // Detecta toque en la tarjeta del Ta-Te-Ti
+    const tatetiBtn = event.target.closest('#btn-tateti');
+    if (tatetiBtn) {
         event.preventDefault();
-        window.launchGame("games/tateti.html");
+        launchGame("games/tateti.html");
         return;
     }
 
-    // Si hace clic en el botón de volver
+    // Detecta toque en el botón volver
     const backBtn = event.target.closest('#btn-back');
     if (backBtn) {
         event.preventDefault();
-        window.closeGame();
+        closeGame();
         return;
     }
 });
