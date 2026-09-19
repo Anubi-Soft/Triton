@@ -1,22 +1,20 @@
+<!-- Dentro de games.html -->
 <div id="app-drawer" class="app-drawer">
     <h3 class="drawer-title">🎮 Galería de Minijuegos</h3>
     <div class="games-grid">
         
-        <button id="btn-tateti" class="game-card" type="button">
+        <!-- Juego 1: Ta-Te-Ti -->
+        <button id="btn-tateti" class="game-card" type="button" onclick="window.launchGame('games/tateti.html')">
             <div class="game-icon">❌⭕</div>
             <span>Ta-Te-Ti AI</span>
         </button>
 
-       <!-- Juego 2: Damas Retro -->
+        <!-- Juego 2: Damas Retro -->
         <button id="btn-checkers" class="game-card" type="button" onclick="window.launchGame('games/checkers.html')">
             <div class="game-icon">⚪🔴</div>
             <span>Damas Retro</span>
         </button>
-      
-        <div class="game-card locked">
-            <div class="game-icon">🐍</div>
-            <span>Próximamente</span>
-        </div>
+
     </div>
 </div>
 
