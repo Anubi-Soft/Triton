@@ -20,7 +20,6 @@
             .game-layout { grid-template-columns: 1fr 1fr; align-items: start; }
         }
 
-        /* Tablero Damas 8x8 */
         #checkers-board {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
@@ -31,24 +30,11 @@
             border-radius: 4px;
         }
 
-        .square {
-            width: 35px;
-            height: 35px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
+        .square { width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; }
         .square.dark { background: rgba(0,0,0,0.5); }
         .square.light { background: rgba(255,255,255,0.1); }
 
-        .piece {
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            border: 2px solid #fff;
-        }
-
+        .piece { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #fff; }
         .piece-r { background: #ff4444; }
         .piece-b { background: #333; }
         .piece.selected { border-color: #00ffcc; box-shadow: 0 0 8px #00ffcc; }
@@ -63,17 +49,21 @@
 <body>
 
     <div class="game-layout">
-        <!-- Tablero de Damas -->
+        <!-- Columna Izquierda: Juego y Selección de Modo -->
         <div class="card compact-card text-center" style="padding: 12px;">
             <h2>Damas Retro 🔴⚪</h2>
-            <p id="game-status" style="margin: 4px 0; font-weight: bold;">Turno de: Rojas</p>
+            
+            <!-- Contenedor donde se inyecta el selector universal -->
+            <div id="mode-selector-container"></div>
+
+            <p id="game-status" style="margin: 6px 0; font-weight: bold;">Turno de: Rojas</p>
             
             <div id="checkers-board"></div>
             
             <button class="btn-reset" onclick="initCheckers()" style="padding: 4px 12px; margin-top: 5px;">Reiniciar Partida</button>
         </div>
 
-        <!-- Chat con AnubiBot -->
+        <!-- Columna Derecha: Chat con AnubiBot -->
         <div class="card compact-card" style="padding: 12px;">
             <h3 style="color: var(--accent-color, #00ffcc);">💬 Chat con AnubiBot</h3>
             
@@ -83,7 +73,7 @@
             </div>
 
             <div id="chat-history" style="height: 140px; overflow-y: auto; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 8px; text-align: left; font-size: 0.85rem; margin-bottom: 8px;">
-                <div><strong style="color: #00A2ED;">AnubiBot:</strong> ¡Bienvenido a Damas! 🎲 Te toca mover primero con las piezas rojas.</div>
+                <div><strong style="color: #00A2ED;">AnubiBot:</strong> ¡Bienvenido a Damas! 🎲 Elegí el modo y arrancamos.</div>
             </div>
 
             <div style="display: flex; gap: 6px;">
@@ -93,7 +83,15 @@
         </div>
     </div>
 
+    <!-- Scripts de Modos, Chat y Lógica -->
+    <script src="../js/game-mode-manager.js"></script>
     <script src="../js/game-logic.js"></script>
     <script src="../js/checkers-logic.js"></script>
+    <script>
+        // Inyectar el selector al cargar
+        document.addEventListener("DOMContentLoaded", () => {
+            GameModeManager.renderSelector('mode-selector-container');
+        });
+    </script>
 </body>
 </html>
