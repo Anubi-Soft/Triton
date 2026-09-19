@@ -2,7 +2,10 @@
 // js/game-logic.js - Gestión del Tablero y Chat Retro
 // =========================================================
 
+// Variables globales con soporte para cambio de bando dinámico
 let boardState = ["", "", "", "", "", "", "", "", ""];
+let playerSymbol = "X";
+let aiSymbol = "O";
 let currentPlayer = "X";
 let isGameActive = true;
 
@@ -10,6 +13,7 @@ let isGameActive = true;
 function makeMove(index) {
     if (boardState[index] !== "" || !isGameActive) return;
 
+    // Registra el movimiento del jugador actual
     boardState[index] = currentPlayer;
     updateBoardUI();
 
@@ -18,14 +22,17 @@ function makeMove(index) {
     const modeElem = document.getElementById("game-mode");
     const mode = modeElem ? modeElem.value : "pvp-local";
 
-    if (mode === "pve" && currentPlayer === "X") {
-        currentPlayer = "O";
-        updateStatus("Turno de: IA (O)");
-        isGameActive = false; // Bloquea clics del usuario mientras la IA procesa
+    if (mode === "pve") {
+        // Si acaba de mover el jugador, le toca a la IA
+        if (currentPlayer === playerSymbol) {
+            currentPlayer = aiSymbol;
+            updateStatus(`Turno de: AnubiBot (${aiSymbol})`);
+            isGameActive = false; // Bloquea clics del usuario mientras la IA procesa
 
-        setTimeout(() => {
-            executeAIMove();
-        }, 400);
+            setTimeout(() => {
+                executeAIMove();
+            }, 400);
+        }
     } else if (mode === "pvp-local") {
         currentPlayer = currentPlayer === "X" ? "O" : "X";
         updateStatus(`Turno de: Jugador ${currentPlayer}`);
@@ -39,11 +46,11 @@ function executeAIMove() {
     if (typeof getAIMove === "function") {
         const aiChoice = getAIMove(boardState, diff);
         if (aiChoice !== null && aiChoice !== undefined) {
-            boardState[aiChoice] = "O";
+            boardState[aiChoice] = aiSymbol;
             updateBoardUI();
             if (!checkWinner()) {
-                currentPlayer = "X";
-                updateStatus("Turno de: Jugador X");
+                currentPlayer = playerSymbol;
+                updateStatus(`Turno de: ${getPlayerName()} (${playerSymbol})`);
                 isGameActive = true;
             }
         }
@@ -70,7 +77,8 @@ function checkWinner() {
     for (let condition of winConditions) {
         const [a, b, c] = condition;
         if (boardState[a] && boardState[a] === boardState[b] && boardState[a] === boardState[c]) {
-            updateStatus(`¡Ganador: Jugador ${boardState[a]}! 🎉`);
+            const winnerName = boardState[a] === playerSymbol ? getPlayerName() : "AnubiBot";
+            updateStatus(`¡Ganador: ${winnerName} (${boardState[a]})! 🎉`);
             isGameActive = false;
             return true;
         }
@@ -85,17 +93,25 @@ function checkWinner() {
     return false;
 }
 
-function resetGame() {
+// Resetea la partida respetando quién arranca según las banderas
+function resetGame(startingPlayer = "X") {
     boardState = ["", "", "", "", "", "", "", "", ""];
-    currentPlayer = "X";
+    currentPlayer = startingPlayer;
     isGameActive = true;
-    updateStatus("Turno de: Jugador X");
+
+    const startText = currentPlayer === playerSymbol ? getPlayerName() : "AnubiBot";
+    updateStatus(`Turno de: ${startText} (${currentPlayer})`);
     updateBoardUI();
 }
 
 function updateStatus(text) {
     const statusElem = document.getElementById("game-status");
     if (statusElem) statusElem.innerText = text;
+}
+
+function getPlayerName() {
+    const nameInput = document.getElementById("player-name");
+    return (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : "Jugador";
 }
 
 function onModeChange() {
@@ -110,7 +126,7 @@ function onModeChange() {
             diffContainer.classList.add("hidden");
         }
     }
-    resetGame();
+    resetGame(playerSymbol);
 }
 
 // =========================================================
@@ -119,10 +135,8 @@ function onModeChange() {
 
 async function sendMessage() {
     const input = document.getElementById("chat-input");
-    const nameInput = document.getElementById("player-name");
-
     const text = input ? input.value.trim() : "";
-    const playerName = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : "Jugador";
+    const playerName = getPlayerName();
 
     if (!text) return;
 
@@ -142,59 +156,58 @@ async function sendMessage() {
         }
 
         const data = await res.json();
-let reply = data.reply || "...";
+        let reply = data.reply || "...";
 
-// 1. Detectamos todas las acciones posibles
-const hasSwitchVS     = reply.includes("[ACTION:SWITCH_AI]");
-const hasAIFirst      = reply.includes("[ACTION:START_AI]");
-const hasUserFirst    = reply.includes("[ACTION:START_USER]");
-const hasChangeSideX  = reply.includes("[ACTION:CHANGE_SIDE_X]");
-const hasChangeSideO  = reply.includes("[ACTION:CHANGE_SIDE_O]");
+        // 1. Detectar acciones
+        const hasSwitchVS     = reply.includes("[ACTION:SWITCH_AI]");
+        const hasAIFirst      = reply.includes("[ACTION:START_AI]");
+        const hasUserFirst    = reply.includes("[ACTION:START_USER]");
+        const hasChangeSideX  = reply.includes("[ACTION:CHANGE_SIDE_X]");
+        const hasChangeSideO  = reply.includes("[ACTION:CHANGE_SIDE_O]");
+        const hasToggleSide   = reply.includes("[ACTION:TOGGLE_SIDE]");
 
-// 2. Limpiamos TODAS las etiquetas ANTES de imprimir en el chat
-let cleanReply = reply
-    .replace("[ACTION:SWITCH_AI]", "")
-    .replace("[ACTION:START_AI]", "")
-    .replace("[ACTION:START_USER]", "")
-    .replace("[ACTION:CHANGE_SIDE_X]", "")
-    .replace("[ACTION:CHANGE_SIDE_O]", "")
-    .trim();
+        // 2. Limpieza TOTAL con expresión regular (evita filtrados visuales)
+        let cleanReply = reply.replace(/\[ACTION:[^\]]+\]/gi, "").trim();
+        appendChatMessage("AnubiBot", cleanReply);
 
-// 3. Imprimimos la respuesta limpia
-appendChatMessage("AnubiBot", cleanReply);
+        // 3. Ejecutar cambios en el juego
+        if (hasSwitchVS || hasAIFirst || hasUserFirst || hasChangeSideX || hasChangeSideO || hasToggleSide) {
+            switchToPVE();
 
-// 4. Ejecutamos los cambios en el juego
-if (hasSwitchVS || hasAIFirst || hasUserFirst || hasChangeSideX || hasChangeSideO) {
-    switchToPVE(); // Asegura que esté en modo Vs IA
-
-    if (hasChangeSideX) {
-        // El usuario pasa a ser X, por ende la IA pasa a ser O y empieza el usuario
-        resetGame();
-        playerSymbol = "X"; 
-        aiSymbol = "O";
-        updateStatus(`Ahora eres 'X'. Turno de: ${playerName}`);
-    } 
-    else if (hasChangeSideO) {
-        // El usuario pasa a ser O, la IA pasa a ser X y arranca la IA
-        resetGame();
-        playerSymbol = "O";
-        aiSymbol = "X";
-        currentPlayer = "X";
-        updateStatus("Ahora eres 'O'. Turno de: AnubiBot (X)");
-        isGameActive = false;
-        setTimeout(() => executeAIMove(), 500);
-    }
-    else if (hasAIFirst) {
-        resetGame();
-        currentPlayer = aiSymbol;
-        updateStatus(`Turno de: AnubiBot (${aiSymbol})`);
-        isGameActive = false;
-        setTimeout(() => executeAIMove(), 500);
-    } 
-    else if (hasUserFirst) {
-        resetGame();
-    }
-}
+            // Alternar bando automáticamente si dice "cambiamos"
+            if (hasToggleSide) {
+                if (playerSymbol === "X") {
+                    playerSymbol = "O";
+                    aiSymbol = "X";
+                } else {
+                    playerSymbol = "X";
+                    aiSymbol = "O";
+                }
+                resetGame(playerSymbol);
+                updateStatus(`Ahora eres '${playerSymbol}'. Turno de: ${playerName}`);
+            }
+            else if (hasChangeSideX) {
+                playerSymbol = "X"; 
+                aiSymbol = "O";
+                resetGame("X");
+                updateStatus(`Ahora eres 'X'. Turno de: ${playerName}`);
+            } 
+            else if (hasChangeSideO) {
+                playerSymbol = "O";
+                aiSymbol = "X";
+                resetGame("X"); // Arranca X (que ahora es la IA)
+                isGameActive = false;
+                setTimeout(() => executeAIMove(), 500);
+            }
+            else if (hasAIFirst) {
+                resetGame(aiSymbol);
+                isGameActive = false;
+                setTimeout(() => executeAIMove(), 500);
+            } 
+            else if (hasUserFirst) {
+                resetGame(playerSymbol);
+            }
+        }
 
     } catch (err) {
         appendChatMessage("AnubiBot", `[Error Conexión]: ${err.message}`);
@@ -229,34 +242,15 @@ function appendChatMessage(sender, text) {
     history.appendChild(msgDiv);
     history.scrollTop = history.scrollHeight;
 }
-// =========================================================
-// Auto-Scroll al enfocar la caja de texto en celulares
-// =========================================================
 
+// Auto-Scroll para el teclado en móviles
 const chatInput = document.getElementById("chat-input");
-
 if (chatInput) {
-    // Cuando el usuario toca para escribir
     chatInput.addEventListener("focus", () => {
         setTimeout(() => {
-            // Desplaza la pantalla suavemente hacia la caja de texto
             chatInput.scrollIntoView({ behavior: "smooth", block: "center" });
-            
-            // Si el historial del chat está presente, lo lleva al último mensaje
             const history = document.getElementById("chat-history");
-            if (history) {
-                history.scrollTop = history.scrollHeight;
-            }
-        }, 300); // 300ms le da tiempo al teclado de Android/iOS para desplegarse
+            if (history) history.scrollTop = history.scrollHeight;
+        }, 300);
     });
 }
-
-// Soporte nativo para navegadores con Visual Viewport (Chrome Mobile)
-if (window.visualViewport) {
-    window.visualViewport.addEventListener("resize", () => {
-        const activeElem = document.activeElement;
-        if (activeElem && activeElem.id === "chat-input") {
-            activeElem.scrollIntoView({ behavior: "smooth", block: "center" });
-        }
-    });
-                   }
