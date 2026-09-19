@@ -424,3 +424,99 @@ body {
     border-radius: 4px 4px 0 0 !important;
   }
 }
+/* =========================================================
+   9. ESCRITORIO Y CAJÓN DE JUEGOS (GAMES HUB)
+   ========================================================= */
+.main-workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.game-viewport {
+  position: relative;
+  min-height: 380px;
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.btn-retro-back {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+  background-color: var(--accent-color);
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.8rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.app-drawer {
+  position: absolute;
+  inset: 0;
+  background-color: var(--card-bg);
+  padding: 20px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.drawer-title {
+  font-size: 1.1rem;
+  color: var(--accent-color);
+  margin-bottom: 15px;
+}
+
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 15px;
+  width: 100%;
+}
+
+.game-card {
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 15px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.game-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent-color);
+}
+
+.game-card.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.game-icon {
+  font-size: 2rem;
+  margin-bottom: 6px;
+}
+
+.game-frame {
+  width: 100%;
+  height: 380px;
+  border: none;
+}
+
+/* Placeholder Cyan para el Nick */
+#player-name::placeholder {
+  color: var(--color-brand-cyan);
+  opacity: 0.8;
+}
