@@ -1,5 +1,5 @@
 // =========================================================
-// js/games-hub.js - Control del Cajón e Interacción Iframe
+// js/games-hub.js - Lógica del Cajón y Manejo de Iframe
 // =========================================================
 
 function launchGame(gameUrl) {
@@ -10,8 +10,8 @@ function launchGame(gameUrl) {
     if (frame && drawer && btnBack) {
         frame.src = gameUrl;
         frame.classList.remove('hidden');
-        drawer.classList.add('hidden'); // Se oculta el cajón mostrando el chat + juego
-        btnBack.classList.remove('hidden');
+        drawer.classList.add('hidden'); // Oculta el cajón de minijuegos
+        btnBack.classList.remove('hidden'); // Muestra la flecha <= Atrás
     }
 }
 
@@ -21,12 +21,14 @@ function closeGame() {
     const btnBack = document.getElementById('btn-back');
 
     if (frame && drawer && btnBack) {
-        frame.src = 'about:blank';
+        frame.src = 'about:blank'; // Vacía el iframe para no gastar recursos
         frame.classList.add('hidden');
-        drawer.classList.remove('hidden'); // Tapa todo con la Galería
+        drawer.classList.remove('hidden'); // Vuelve a mostrar el cajón
         btnBack.classList.add('hidden');
     }
 }
+
+
 
 // Función puente para que el iframe ordene ejecutar movimientos o reseteos
 window.addEventListener("message", (event) => {
