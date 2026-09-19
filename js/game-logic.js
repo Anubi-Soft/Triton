@@ -145,16 +145,16 @@ async function sendMessage() {
         let reply = data.reply || "...";
 
         // Detección de Acciones devueltas por la IA
-        const hasSwitchVS = reply.includes("[ACTION:SWITCH_VS_AI]");
-        const hasAIFirst = reply.includes("[ACTION:START_AI_FIRST]");
-        const hasUserFirst = reply.includes("[ACTION:START_USER_FIRST]");
+        const hasSwitchVS = reply.includes("[ACTION:SWITCH_AI]");
+const hasAIFirst = reply.includes("[ACTION:START_AI]");
+const hasUserFirst = reply.includes("[ACTION:START_USER]");
 
-        // Limpiar las etiquetas del texto a mostrar en el chat
-        reply = reply
-            .replace("[ACTION:SWITCH_VS_AI]", "")
-            .replace("[ACTION:START_AI_FIRST]", "")
-            .replace("[ACTION:START_USER_FIRST]", "")
-            .trim();
+reply = reply
+    .replace("[ACTION:SWITCH_AI]", "")
+    .replace("[ACTION:START_AI]", "")
+    .replace("[ACTION:START_USER]", "")
+    .trim();
+
 
         appendChatMessage("AnubiBot", reply);
 
