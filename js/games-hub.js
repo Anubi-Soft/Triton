@@ -2,47 +2,49 @@
 // js/games-hub.js - Control del Cajón de Minijuegos
 // =========================================================
 
-function launchGame(gameUrl) {
-    // Cartel temporal para confirmar el toque en el celular
-    alert("¡Tocaste el juego! Cargando: " + gameUrl);
+// Forzamos que las funciones sean globales en window
+window.launchGame = function(gameUrl) {
+    alert("¡Iniciando carga de: " + gameUrl + "!");
 
     const drawer = document.getElementById('app-drawer');
     const frame = document.getElementById('game-frame');
     const btnBack = document.getElementById('btn-back');
 
-    if (frame && drawer && btnBack) {
+    if (drawer) drawer.classList.add('hidden');
+    if (frame) {
         frame.src = gameUrl;
         frame.classList.remove('hidden');
-        drawer.classList.add('hidden'); // Oculta el cajón
-        btnBack.classList.remove('hidden'); // Muestra botón Volver
     }
-}
+    if (btnBack) btnBack.classList.remove('hidden');
+};
 
-function closeGame() {
+window.closeGame = function() {
     const drawer = document.getElementById('app-drawer');
     const frame = document.getElementById('game-frame');
     const btnBack = document.getElementById('btn-back');
 
-    if (frame && drawer && btnBack) {
+    if (frame) {
         frame.src = 'about:blank';
         frame.classList.add('hidden');
-        drawer.classList.remove('hidden'); // Vuelve al cajón
-        btnBack.classList.add('hidden');
     }
-}
+    if (drawer) drawer.classList.remove('hidden');
+    if (btnBack) btnBack.classList.add('hidden');
+};
 
-// Escuchadores de eventos cuando el HTML termina de cargar
+// Escuchador táctil directo para móviles (touchstart + click)
 document.addEventListener("DOMContentLoaded", () => {
     const btnTateti = document.getElementById("btn-tateti");
     const btnBack = document.getElementById("btn-back");
 
     if (btnTateti) {
-        btnTateti.addEventListener("click", () => {
-            launchGame("games/tateti.html");
-        });
+        const dispararJuego = (e) => {
+            e.preventDefault();
+            window.launchGame("games/tateti.html");
+        };
+        btnTateti.addEventListener("click", dispararJuego);
     }
 
     if (btnBack) {
-        btnBack.addEventListener("click", closeGame);
+        btnBack.addEventListener("click", window.closeGame);
     }
 });
