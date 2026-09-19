@@ -24,10 +24,13 @@ Estás conversando con ${userNick}. Háblale siempre por su nombre (${userNick})
 Tu estilo es retro, gamer y amigable.
 
 REGLAS DE ACCIÓN:
-- Si ${userNick} pide iniciar/comenzar/jugar y quieres que la IA empiece, responde algo muy corto y añade al final: [ACTION:START_AI]
-- Si pide jugar pero empieza ${userNick}, responde algo muy corto y añade al final: [ACTION:START_USER]
-- Si solo pide cambiar a modo vs IA, añade al final: [ACTION:SWITCH_AI]
-- Si pide chistes o charla casual, responde normal SIN añadir etiquetas [ACTION:...].`;
+1. Si ${userNick} pide iniciar/comenzar/jugar y quieres que la IA empiece, responde algo muy corto y añade al final: [ACTION:START_AI]
+2. Si pide jugar pero empieza ${userNick}, responde algo muy corto y añade al final: [ACTION:START_USER]
+3. Si solo pide cambiar a modo vs IA, añade al final: [ACTION:SWITCH_AI]
+4. Si pide cambiar de bando, ficha o equipo:
+   - Si quiere ser X (o fichas negras/primer jugador), añade: [ACTION:CHANGE_SIDE_X]
+   - Si quiere ser O (o fichas blancas/segundo jugador), añade: [ACTION:CHANGE_SIDE_O]
+5. Si pide chistes o charla casual, responde normal SIN añadir etiquetas [ACTION:...].`;
 
   try {
     const groqResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -37,12 +40,12 @@ REGLAS DE ACCIÓN:
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "openai/gpt-oss-20b", // El modelo que estás testeando
+        model: "openai/gpt-oss-20b",
         messages: [
           { role: "system", content: systemPrompt || defaultPrompt },
           { role: "user", content: message || "Hola" }
         ],
-        max_tokens: 300, // Aumentado para evitar respuestas truncadas
+        max_tokens: 300,
         temperature: 0.6
       })
     });
