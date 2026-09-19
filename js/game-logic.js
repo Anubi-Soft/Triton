@@ -115,15 +115,12 @@ function updateStatus(text) {
     if (statusElem) statusElem.innerText = text;
 }
 
-
 // =========================================================
 // Obtener el Nick con Fallback Seguro
 // =========================================================
 function getPlayerName() {
     const nameInput = document.getElementById("player-name");
     const val = nameInput ? nameInput.value.trim() : "";
-    
-    // Si es null, undefined o está vacío "", responde con "Jugador"
     return val !== "" ? val : "Jugador";
 }
 
@@ -136,8 +133,8 @@ const chatInputElem = document.getElementById("chat-input");
 if (nameInputElem && chatInputElem) {
     nameInputElem.addEventListener("keydown", (event) => {
         if (event.key === "Enter") {
-            event.preventDefault(); // Evita envíos accidentales de formulario
-            chatInputElem.focus();   // Pasa el foco directamente al input de mensaje
+            event.preventDefault();
+            chatInputElem.focus();
         }
     });
 }
@@ -158,7 +155,7 @@ function onModeChange() {
 }
 
 // =========================================================
-// Envió de Mensajes y Control Dinámico desde el Chat
+// Envío de Mensajes y Control Dinámico desde el Chat
 // =========================================================
 
 async function sendMessage() {
@@ -193,7 +190,6 @@ async function sendMessage() {
         const hasChangeSideO  = reply.includes("[ACTION:CHANGE_SIDE_O]");
         const hasToggleSide   = reply.includes("[ACTION:TOGGLE_SIDE]");
 
-        // Si la respuesta quedó vacía por la etiqueta, le ponemos un texto genérico
         let cleanReply = reply.replace(/\[ACTION:[^\]]+\]/gi, "").trim();
         if (!cleanReply) cleanReply = "¡A jugar!";
 
@@ -220,7 +216,7 @@ async function sendMessage() {
             else if (hasChangeSideO) {
                 playerSymbol = "O";
                 aiSymbol = "X";
-                resetGame("X"); // Arranca X (AnubiBot)
+                resetGame("X");
                 isGameActive = false;
                 setTimeout(() => executeAIMove(), 500);
             }
@@ -265,25 +261,13 @@ function appendChatMessage(sender, text) {
 
     msgDiv.innerHTML = `<strong style="color: ${color};">${escapeHTML(sender)}:</strong> ${escapeHTML(text)}`;
     history.appendChild(msgDiv);
-    scrollToBottom()
-    history.scrollTop = history.scrollHeight;
+    scrollToBottom();
 }
 
-const chatInput = document.getElementById("chat-input");
-if (chatInput) {
-    chatInput.addEventListener("focus", () => {
-        setTimeout(() => {
-            chatInput.scrollIntoView({ behavior: "smooth", block: "center" });
-            const history = document.getElementById("chat-history");
-            if (history) history.scrollTop = history.scrollHeight;
-        }, 300);
-    });
-}
 // =========================================================
 // Auto-Scroll para el Chat e Input Focus en Móviles
 // =========================================================
 
-// Asegura que el contenedor de chat siempre muestre el último mensaje
 function scrollToBottom() {
     const history = document.getElementById("chat-history");
     if (history) {
@@ -291,12 +275,11 @@ function scrollToBottom() {
     }
 }
 
-// Escuchador para cuando el usuario hace foco en el input (desplazamiento suave)
-const chatInput = document.getElementById("chat-input");
-if (chatInput) {
-    chatInput.addEventListener("focus", () => {
+// Una única declaración del listener de foco para el input del chat
+if (chatInputElem) {
+    chatInputElem.addEventListener("focus", () => {
         setTimeout(() => {
-            chatInput.scrollIntoView({ behavior: "smooth", block: "center" });
+            chatInputElem.scrollIntoView({ behavior: "smooth", block: "center" });
             scrollToBottom();
         }, 300);
     });
