@@ -43,3 +43,17 @@ function loadModule(filePath, containerId, callback) {
     })
     .catch(err => console.error('Error cargando el módulo:', err));
 }
+
+// Función que arranca el Ta-Te-Ti y el Chat una vez que el HTML fue inyectado
+function initGameLogic() {
+  // Acá pegás la lógica del Ta-Te-Ti y del Chat que teníamos antes
+  // Por ejemplo:
+  const board = document.getElementById('board');
+  if (board) {
+    board.addEventListener('click', (e) => {
+      if (e.target.classList.contains('cell')) {
+        // Lógica de jugar ficha...
+      }
+    });
+  }
+}
