@@ -14,22 +14,20 @@ export default async function handler(req, res) {
   const API_KEY = process.env.GROQ_API_KEY;
 
   if (!API_KEY) {
-    return res.status(500).json({ reply: "¡Falta GROQ_API_KEY en las variables de entorno de Vercel!" });
+    return res.status(500).json({ reply: "Falta GROQ_API_KEY en Vercel" });
   }
 
   const userNick = (playerName && playerName.trim()) ? playerName.trim() : "Gamer";
 
-  const defaultPrompt = `Eres AnubiBot, la IA gamer y retro oficial de AnubiSoft (estilo MSN Messenger / Windows XP).
-Estás hablando directamente con el usuario "${userNick}". SIEMPRE debes dirigirte a él por su nombre (${userNick}) en el saludo o la conversación.
+  const defaultPrompt = `Eres AnubiBot, la IA oficial de AnubiSoft. 
+Estás conversando con ${userNick}. Háblale siempre por su nombre (${userNick}).
+Tu estilo es retro, gamer y amigable.
 
-REGLAS DE MODO DE JUEGO Y COMANDOS:
-1. Si ${userNick} pide jugar contra ti o iniciar/reiniciar la partida:
-   - Si quiere que TÚ (la IA) hagas el primer movimiento, salúdalo y añade al final de tu mensaje: [ACTION:START_AI_FIRST]
-   - Si él/ella quiere empezar, salúdalo y añade al final de tu mensaje: [ACTION:START_USER_FIRST]
-   - Si solo pide cambiar a modo vs IA, responde avisándole que cambiarás el selector y añade: [ACTION:SWITCH_VS_AI]
-2. Si está jugando en modo local o P2P y te pide chistes, consejos o charla casual, responde amigablemente SIN incluir ninguna etiqueta [ACTION:...], permitiendo que el juego local continúe sin interrupciones.
-
-Responde de forma concisa, divertida y en español Latino.`;
+REGLAS DE ACCIÓN:
+- Si ${userNick} pide iniciar/comenzar/jugar y quieres que la IA empiece, responde algo muy corto y añade al final: [ACTION:START_AI]
+- Si pide jugar pero empieza ${userNick}, responde algo muy corto y añade al final: [ACTION:START_USER]
+- Si solo pide cambiar a modo vs IA, añade al final: [ACTION:SWITCH_AI]
+- Si pide chistes o charla casual, responde normal SIN añadir etiquetas [ACTION:...].`;
 
   try {
     const groqResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -39,24 +37,24 @@ Responde de forma concisa, divertida y en español Latino.`;
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "openai/gpt-oss-20b",
+        model: "openai/gpt-oss-20b", // El modelo que estás testeando
         messages: [
           { role: "system", content: systemPrompt || defaultPrompt },
           { role: "user", content: message || "Hola" }
         ],
-        max_tokens: 150,
-        temperature: 0.7
+        max_tokens: 300, // Aumentado para evitar respuestas truncadas
+        temperature: 0.6
       })
     });
 
     const data = await groqResponse.json();
 
     if (!groqResponse.ok) {
-      const detail = data?.error?.message || "Error al conectar con la API de Groq.";
+      const detail = data?.error?.message || "Error en Groq API";
       return res.status(200).json({ reply: `[Error Groq]: ${detail}` });
     }
 
-    const reply = data.choices?.[0]?.message?.content?.trim() || "¡Se cortó la señal retro!";
+    const reply = data.choices?.[0]?.message?.content?.trim() || "¡Llegó una respuesta vacía!";
     return res.status(200).json({ reply });
 
   } catch (err) {
