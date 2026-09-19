@@ -115,9 +115,31 @@ function updateStatus(text) {
     if (statusElem) statusElem.innerText = text;
 }
 
+
+// =========================================================
+// Obtener el Nick con Fallback Seguro
+// =========================================================
 function getPlayerName() {
     const nameInput = document.getElementById("player-name");
-    return (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : "Jugador";
+    const val = nameInput ? nameInput.value.trim() : "";
+    
+    // Si es null, undefined o está vacío "", responde con "Jugador"
+    return val !== "" ? val : "Jugador";
+}
+
+// =========================================================
+// UX: Salto automático del Nick al Chat con Enter
+// =========================================================
+const nameInputElem = document.getElementById("player-name");
+const chatInputElem = document.getElementById("chat-input");
+
+if (nameInputElem && chatInputElem) {
+    nameInputElem.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault(); // Evita envíos accidentales de formulario
+            chatInputElem.focus();   // Pasa el foco directamente al input de mensaje
+        }
+    });
 }
 
 function onModeChange() {
@@ -243,6 +265,7 @@ function appendChatMessage(sender, text) {
 
     msgDiv.innerHTML = `<strong style="color: ${color};">${escapeHTML(sender)}:</strong> ${escapeHTML(text)}`;
     history.appendChild(msgDiv);
+    scrollToBottom()
     history.scrollTop = history.scrollHeight;
 }
 
@@ -253,6 +276,28 @@ if (chatInput) {
             chatInput.scrollIntoView({ behavior: "smooth", block: "center" });
             const history = document.getElementById("chat-history");
             if (history) history.scrollTop = history.scrollHeight;
+        }, 300);
+    });
+}
+// =========================================================
+// Auto-Scroll para el Chat e Input Focus en Móviles
+// =========================================================
+
+// Asegura que el contenedor de chat siempre muestre el último mensaje
+function scrollToBottom() {
+    const history = document.getElementById("chat-history");
+    if (history) {
+        history.scrollTop = history.scrollHeight;
+    }
+}
+
+// Escuchador para cuando el usuario hace foco en el input (desplazamiento suave)
+const chatInput = document.getElementById("chat-input");
+if (chatInput) {
+    chatInput.addEventListener("focus", () => {
+        setTimeout(() => {
+            chatInput.scrollIntoView({ behavior: "smooth", block: "center" });
+            scrollToBottom();
         }, 300);
     });
 }
