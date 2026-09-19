@@ -1,14 +1,12 @@
-<!-- CAJÓN DE JUEGOS -->
 <div id="app-drawer" class="app-drawer">
     <h3 class="drawer-title">🎮 Galería de Minijuegos</h3>
     <div class="games-grid">
         
-        <!-- Tarjeta como Botón Accesible y Táctil -->
-    <button id="btn-tateti" class="game-card" type="button" onclick="window.launchGame('games/tateti.html')">
-         <div class="game-icon">❌⭕</div>
-         <span>Ta-Te-Ti AI</span>
-     </button>
-
+        <!-- Botón con ID para delegación -->
+        <button id="btn-tateti" class="game-card" type="button">
+            <div class="game-icon">❌⭕</div>
+            <span>Ta-Te-Ti AI</span>
+        </button>
         
         <div class="game-card locked">
             <div class="game-icon">🐍</div>
@@ -17,15 +15,9 @@
     </div>
 </div>
 
-<!-- ÁREA DEL JUEGO ACTIVO -->
 <div class="game-viewport">
     <button id="btn-back" class="btn-retro-back hidden" type="button">
         ⬅️ Volver al Menú
     </button>
     <iframe id="game-frame" class="game-frame hidden" src="about:blank"></iframe>
 </div>
-
-<!-- Cargar el script justo al final -->
-<script src="js/games-hub.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vconsole@latest/dist/vconsole.min.js"></script>
-<script>var vConsole = new VConsole();</script>
