@@ -1,11 +1,10 @@
 // =========================================================
-// js/games-hub.js - Control del Cajón de Minijuegos
+// js/games-hub.js - Control del Cajón e Iframe (Delegado)
 // =========================================================
 
-// Forzamos que las funciones sean globales en window
 window.launchGame = function(gameUrl) {
-    alert("¡Iniciando carga de: " + gameUrl + "!");
-
+    console.log("Cargando juego:", gameUrl);
+    
     const drawer = document.getElementById('app-drawer');
     const frame = document.getElementById('game-frame');
     const btnBack = document.getElementById('btn-back');
@@ -19,6 +18,8 @@ window.launchGame = function(gameUrl) {
 };
 
 window.closeGame = function() {
+    console.log("Cerrando juego y volviendo al menú");
+    
     const drawer = document.getElementById('app-drawer');
     const frame = document.getElementById('game-frame');
     const btnBack = document.getElementById('btn-back');
@@ -31,20 +32,21 @@ window.closeGame = function() {
     if (btnBack) btnBack.classList.add('hidden');
 };
 
-// Escuchador táctil directo para móviles (touchstart + click)
-document.addEventListener("DOMContentLoaded", () => {
-    const btnTateti = document.getElementById("btn-tateti");
-    const btnBack = document.getElementById("btn-back");
-
-    if (btnTateti) {
-        const dispararJuego = (e) => {
-            e.preventDefault();
-            window.launchGame("games/tateti.html");
-        };
-        btnTateti.addEventListener("click", dispararJuego);
+// Delegación global de clics para atrapar los botones sin importar el fetch
+document.addEventListener("click", function(event) {
+    // Si hace clic en la tarjeta de Tateti (o cualquier elemento dentro de ella)
+    const tatetiCard = event.target.closest('#btn-tateti');
+    if (tatetiCard) {
+        event.preventDefault();
+        window.launchGame("games/tateti.html");
+        return;
     }
 
-    if (btnBack) {
-        btnBack.addEventListener("click", window.closeGame);
+    // Si hace clic en el botón de volver
+    const backBtn = event.target.closest('#btn-back');
+    if (backBtn) {
+        event.preventDefault();
+        window.closeGame();
+        return;
     }
 });
