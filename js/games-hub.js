@@ -3,6 +3,8 @@
 // =========================================================
 
 window.launchGame = function(gameUrl) {
+    console.log("[GamesHub] Lanzando juego:", gameUrl);
+    
     // 1. Ocultar el menú/drawer de minijuegos
     const drawer = document.getElementById('app-drawer');
     if (drawer) drawer.classList.add('hidden');
@@ -32,16 +34,22 @@ window.closeGame = function() {
     if (btnBack) btnBack.classList.add('hidden');
 };
 
-// Listener global para clics
+window.initGamesHub = function() {
+    console.log("[GamesHub] Módulo de minijuegos listo.");
+};
+
+// Escuchador global en el documento (intercepta clics dinámicos)
 document.addEventListener("click", function(event) {
-    const tatetiBtn = event.target.closest('#btn-tateti') || event.target.closest('.game-card');
+    // Verificar si el clic fue en la tarjeta de Ta-Te-Ti
+    const tatetiBtn = event.target.closest('#btn-tateti') || event.target.closest('.game-card:not(.locked)');
     
-    if (tatetiBtn && !tatetiBtn.classList.contains('locked')) {
+    if (tatetiBtn) {
         event.preventDefault();
         window.launchGame("games/tateti.html");
         return;
     }
 
+    // Verificar si el clic fue en el botón Volver
     const backBtn = event.target.closest('#btn-back');
     if (backBtn) {
         event.preventDefault();
