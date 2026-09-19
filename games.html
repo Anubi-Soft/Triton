@@ -1,45 +1,39 @@
-<!-- CONTENEDOR PRINCIPAL: SALA DE JUEGOS -->
 <div class="main-workspace">
     
-    <!-- ÁREA SUPERIOR: REPRODUCTOR DE JUEGOS Y CAJÓN -->
-    <div class="game-viewport" id="game-viewport">
-        
-        <!-- Botón de Navegación (Visible solo cuando hay un juego abierto) -->
-        <button id="btn-back" class="btn-retro hidden" onclick="closeGame()">
-            ⬅️ Volver al Menú
-        </button>
-
-        <!-- CAJÓN DE JUEGOS (Se superpone tipo App Drawer) -->
-        <div id="app-drawer" class="app-drawer">
-            <h3 class="drawer-title">🎮 Galería de Minijuegos</h3>
-            <div class="games-grid">
-                <!-- Tarjeta de Tateti -->
-                <div class="game-card" onclick="launchGame('tateti.html')">
-                    <div class="game-icon">❌⭕</div>
-                    <span>Ta-Te-Ti AI</span>
-                </div>
-                
-                <!-- Próximos juegos -->
-                <div class="game-card locked">
-                    <div class="game-icon">🐍</div>
-                    <span>Próximamente</span>
-                </div>
+    <!-- CAJÓN DE JUEGOS (Cubre todo al inicio) -->
+    <div id="app-drawer" class="app-drawer">
+        <h3 class="drawer-title">🎮 Galería de Minijuegos</h3>
+        <div class="games-grid">
+            <!-- Al hacer clic abre tateti.html -->
+            <div class="game-card" onclick="launchGame('tateti.html')">
+                <div class="game-icon">❌⭕</div>
+                <span>Ta-Te-Ti AI</span>
+            </div>
+            
+            <div class="game-card locked">
+                <div class="game-icon">🐍</div>
+                <span>Próximamente</span>
             </div>
         </div>
+    </div>
 
-        <!-- Marco donde se renderiza el juego cargado -->
+    <!-- ÁREA DEL JUEGO ACTIVO (Se ve al elegir un juego) -->
+    <div class="game-viewport">
+        <button id="btn-back" class="btn-retro-back hidden" onclick="closeGame()">
+            ⬅️ Volver al Menú
+        </button>
         <iframe id="game-frame" class="game-frame hidden" src="about:blank"></iframe>
     </div>
 
-    <!-- ÁREA INFERIOR: CHAT COMPARTIDO (Siempre activo) -->
+    <!-- CHAT DE LA SALA (Queda debajo del iframe al jugar) -->
     <div class="chat-section">
-        <div class="chat-header">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <span class="chat-title">💬 Chat de la Sala</span>
-            <input type="text" id="player-name" class="select-style cyan-placeholder" placeholder="Aquí tu Nick...">
+            <input type="text" id="player-name" class="select-style cyan-placeholder" style="width: 120px; font-size: 12px; padding: 3px 6px;" placeholder="Aquí tu Nick...">
         </div>
         
         <div id="chat-history" class="chat-box">
-            <div class="chat-welcome">¡Bienvenido! Elegí un juego arriba o charlá con AnubiBot...</div>
+            <div class="chat-welcome">¡Bienvenido! Hablá con tu rival o la IA...</div>
         </div>
 
         <div class="chat-input-wrapper">
