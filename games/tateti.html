@@ -4,77 +4,143 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ta-Te-Ti</title>
-    <!-- Salimos de games/ para buscar la carpeta css/ -->
     <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        /* Estilos compactos específicos para el layout del juego */
+        body {
+            background: transparent;
+            padding: 5px;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        .game-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* En monitores / modo escritorio se ubican lado a lado */
+        @media (min-width: 768px) {
+            .game-layout {
+                grid-template-columns: 1fr 1fr;
+                align-items: start;
+            }
+        }
+
+        .compact-card {
+            padding: 12px !important;
+            margin-bottom: 0 !important;
+        }
+
+        .compact-board {
+            max-width: 260px;
+            margin: 8px auto;
+        }
+
+        .compact-board .cell {
+            height: 70px;
+            font-size: 1.8rem;
+        }
+
+        .chat-history-compact {
+            height: 180px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            padding: 8px;
+            text-align: left;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .compact-board {
+                max-width: 220px;
+            }
+            .compact-board .cell {
+                height: 60px;
+                font-size: 1.5rem;
+            }
+            .chat-history-compact {
+                height: 120px;
+            }
+            h2, h3 {
+                font-size: 1rem !important;
+                margin: 2px 0 !important;
+            }
+        }
+    </style>
 </head>
-<body style="background: transparent; padding: 10px;">
+<body>
 
-    <div class="card text-center" style="margin-bottom: 15px;">
-        <h2>Ta-Te-Ti Retro 🎮</h2>
-        
-        <div class="controls-wrapper">
-            <div>
-                <label for="game-mode" class="label-sm">Modo: </label>
-                <select id="game-mode" class="select-style" onchange="onModeChange()">
-                    <option value="pvp-local">2 Jugadores (Mismo Celular)</option>
-                    <option value="pvp-online">2 Jugadores (Online P2P)</option>
-                    <option value="pve">vs IA</option>
-                </select>
+    <div class="game-layout">
+        <!-- Columna Izquierda: Juego -->
+        <div class="card compact-card text-center">
+            <h2>Ta-Te-Ti Retro 🎮</h2>
+            
+            <div class="controls-wrapper" style="margin: 5px 0;">
+                <div>
+                    <label for="game-mode" class="label-sm">Modo: </label>
+                    <select id="game-mode" class="select-style" onchange="onModeChange()">
+                        <option value="pvp-local">2 Jugadores (Mismo Celular)</option>
+                        <option value="pvp-online">2 Jugadores (Online P2P)</option>
+                        <option value="pve">vs IA</option>
+                    </select>
+                </div>
+
+                <div id="difficulty-container" class="hidden" style="display: none;">
+                    <label for="game-difficulty" class="label-sm">Dificultad: </label>
+                    <select id="game-difficulty" class="select-style" onchange="resetGame()">
+                        <option value="easy">😊 Fácil</option>
+                        <option value="medium">😐 Medio</option>
+                        <option value="hard">😈 Imbatible</option>
+                    </select>
+                </div>
             </div>
 
-            <div id="difficulty-container" class="hidden" style="display: none;">
-                <label for="game-difficulty" class="label-sm">Dificultad: </label>
-                <select id="game-difficulty" class="select-style" onchange="resetGame()">
-                    <option value="easy">😊 Fácil</option>
-                    <option value="medium">😐 Medio</option>
-                    <option value="hard">😈 Imbatible</option>
-                </select>
+            <p id="game-status" style="margin: 4px 0; font-weight: bold;">Turno de: Jugador X</p>
+            
+            <div class="board compact-board">
+                <div class="cell" onclick="makeMove(0)"></div>
+                <div class="cell" onclick="makeMove(1)"></div>
+                <div class="cell" onclick="makeMove(2)"></div>
+                <div class="cell" onclick="makeMove(3)"></div>
+                <div class="cell" onclick="makeMove(4)"></div>
+                <div class="cell" onclick="makeMove(5)"></div>
+                <div class="cell" onclick="makeMove(6)"></div>
+                <div class="cell" onclick="makeMove(7)"></div>
+                <div class="cell" onclick="makeMove(8)"></div>
             </div>
+            
+            <button class="btn-reset" onclick="resetGame()" style="margin-top: 5px; padding: 4px 12px;">Reiniciar Partida</button>
         </div>
 
-        <p id="game-status">Turno de: Jugador X</p>
-        
-        <div class="board">
-            <div class="cell" onclick="makeMove(0)"></div>
-            <div class="cell" onclick="makeMove(1)"></div>
-            <div class="cell" onclick="makeMove(2)"></div>
-            <div class="cell" onclick="makeMove(3)"></div>
-            <div class="cell" onclick="makeMove(4)"></div>
-            <div class="cell" onclick="makeMove(5)"></div>
-            <div class="cell" onclick="makeMove(6)"></div>
-            <div class="cell" onclick="makeMove(7)"></div>
-            <div class="cell" onclick="makeMove(8)"></div>
+        <!-- Columna Derecha: Chat -->
+        <div class="card compact-card">
+            <h3 style="color: var(--accent-color, #00ffcc);">💬 Chat con AnubiBot</h3>
+            
+            <div style="margin: 5px 0; display: flex; align-items: center; gap: 6px;">
+                <label for="player-name" class="label-sm" style="white-space: nowrap;">Nick: </label>
+                <input type="text" id="player-name" class="select-style" placeholder="Ej: Juan" style="width: 100%; text-align: left;" value="Jugador">
+            </div>
+
+            <div id="chat-history" class="chat-history-compact">
+                <div style="margin-bottom: 6px;">
+                    <strong style="color: #00A2ED;">AnubiBot:</strong> ¡Hola! Soy AnubiBot 🤖. Podés pedirme reiniciar la partida o cambiar de lado.
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 6px;">
+                <input type="text" id="chat-input" class="select-style" placeholder="Escribe un mensaje..." style="flex: 1; text-align: left;" onkeydown="if(event.key==='Enter') sendMessage()">
+                <button onclick="sendMessage()" class="btn-reset" style="padding: 4px 10px; margin: 0;">Enviar</button>
+            </div>
         </div>
-        
-        <button class="btn-reset" onclick="resetGame()" style="margin-top: 15px;">Reiniciar Partida</button>
     </div>
 
-    <!-- ========================================================= -->
-    <!-- Contenedor del Chat con AnubiBot                          -->
-    <!-- ========================================================= -->
-    <div class="card" style="margin-bottom: 20px;">
-        <h3 style="margin-bottom: 10px; font-size: 1.1rem; color: var(--accent-color, #00ffcc);">💬 Chat con AnubiBot</h3>
-        
-        <div style="margin-bottom: 10px;">
-            <label for="player-name" class="label-sm">Tu Nombre / Nick: </label>
-            <input type="text" id="player-name" class="select-style" placeholder="Ej: Juan" style="width: 60%; text-align: left;" value="Jugador">
-        </div>
-
-        <!-- Historial de mensajes -->
-        <div id="chat-history" style="height: 140px; overflow-y: auto; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 8px; text-align: left; font-size: 0.9rem; margin-bottom: 10px;">
-            <div style="margin-bottom: 6px;">
-                <strong style="color: #00A2ED;">AnubiBot:</strong> ¡Hola! Soy AnubiBot 🤖. Podés pedirme reiniciar la partida, cambiar de lado o jugar contra mí desde este chat.
-            </div>
-        </div>
-
-        <!-- Input y botón de envío -->
-        <div style="display: flex; gap: 8px;">
-            <input type="text" id="chat-input" class="select-style" placeholder="Escribe un mensaje..." style="flex: 1; text-align: left;" onkeydown="if(event.key==='Enter') sendMessage()">
-            <button onclick="sendMessage()" class="btn-reset" style="padding: 6px 14px; margin: 0;">Enviar</button>
-        </div>
-    </div>
-
-    <!-- Carga de Scripts del Juego y Chat -->
     <script src="../js/ia-engine.js"></script>
     <script src="../js/game-logic.js"></script>
 </body>
