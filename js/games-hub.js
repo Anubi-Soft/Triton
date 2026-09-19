@@ -1,22 +1,23 @@
 // =========================================================
-// js/games-hub.js - Controlador de Juegos
+// js/games-hub.js - Controlador dinámico de Minijuegos
 // =========================================================
 
 window.launchGame = function(gameUrl) {
+    if (!gameUrl) return;
     console.log("[GamesHub] Lanzando juego:", gameUrl);
     
-    // 1. Ocultar el menú/drawer de minijuegos
+    // 1. Ocultar la galería de juegos
     const drawer = document.getElementById('app-drawer');
     if (drawer) drawer.classList.add('hidden');
 
-    // 2. Cargar la URL en el iframe y mostrarlo
+    // 2. Cargar la URL correspondiente en el iframe y mostrarlo
     const frame = document.getElementById('game-frame');
     if (frame) {
         frame.src = gameUrl;
         frame.classList.remove('hidden');
     }
 
-    // 3. Mostrar el botón de volver
+    // 3. Mostrar el botón de volver al menú
     const btnBack = document.getElementById('btn-back');
     if (btnBack) btnBack.classList.remove('hidden');
 };
@@ -38,18 +39,22 @@ window.initGamesHub = function() {
     console.log("[GamesHub] Módulo de minijuegos listo.");
 };
 
-// Escuchador global en el documento (intercepta clics dinámicos)
+// Delegación de eventos para capturar cualquier tarjeta de juego
 document.addEventListener("click", function(event) {
-    // Verificar si el clic fue en la tarjeta de Ta-Te-Ti
-    const tatetiBtn = event.target.closest('#btn-tateti') || event.target.closest('.game-card:not(.locked)');
+    // Detectar si se hizo clic en alguna tarjeta de juego que no esté bloqueada
+    const gameCard = event.target.closest('.game-card:not(.locked)');
     
-    if (tatetiBtn) {
+    if (gameCard) {
         event.preventDefault();
-        window.launchGame("games/tateti.html");
+        // Obtener la URL del atributo data-game-url o por defecto usará la definida en onclick
+        const gameUrl = gameCard.getAttribute('data-game-url');
+        if (gameUrl) {
+            window.launchGame(gameUrl);
+        }
         return;
     }
 
-    // Verificar si el clic fue en el botón Volver
+    // Detectar si se hizo clic en el botón Volver
     const backBtn = event.target.closest('#btn-back');
     if (backBtn) {
         event.preventDefault();
