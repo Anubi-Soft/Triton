@@ -9,7 +9,7 @@
 </head>
 <body style="background: transparent; padding: 10px;">
 
-    <div class="card text-center" style="margin-bottom: 0;">
+    <div class="card text-center" style="margin-bottom: 15px;">
         <h2>Ta-Te-Ti Retro 🎮</h2>
         
         <div class="controls-wrapper">
@@ -46,15 +46,36 @@
             <div class="cell" onclick="makeMove(8)"></div>
         </div>
         
-        <button class="btn-reset" onclick="resetGame()">Reiniciar Partida</button>
+        <button class="btn-reset" onclick="resetGame()" style="margin-top: 15px;">Reiniciar Partida</button>
     </div>
 
-    <!-- Salimos de games/ para buscar la carpeta js/ -->
+    <!-- ========================================================= -->
+    <!-- Contenedor del Chat con AnubiBot                          -->
+    <!-- ========================================================= -->
+    <div class="card" style="margin-bottom: 20px;">
+        <h3 style="margin-bottom: 10px; font-size: 1.1rem; color: var(--accent-color, #00ffcc);">💬 Chat con AnubiBot</h3>
+        
+        <div style="margin-bottom: 10px;">
+            <label for="player-name" class="label-sm">Tu Nombre / Nick: </label>
+            <input type="text" id="player-name" class="select-style" placeholder="Ej: Juan" style="width: 60%; text-align: left;" value="Jugador">
+        </div>
+
+        <!-- Historial de mensajes -->
+        <div id="chat-history" style="height: 140px; overflow-y: auto; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 8px; text-align: left; font-size: 0.9rem; margin-bottom: 10px;">
+            <div style="margin-bottom: 6px;">
+                <strong style="color: #00A2ED;">AnubiBot:</strong> ¡Hola! Soy AnubiBot 🤖. Podés pedirme reiniciar la partida, cambiar de lado o jugar contra mí desde este chat.
+            </div>
+        </div>
+
+        <!-- Input y botón de envío -->
+        <div style="display: flex; gap: 8px;">
+            <input type="text" id="chat-input" class="select-style" placeholder="Escribe un mensaje..." style="flex: 1; text-align: left;" onkeydown="if(event.key==='Enter') sendMessage()">
+            <button onclick="sendMessage()" class="btn-reset" style="padding: 6px 14px; margin: 0;">Enviar</button>
+        </div>
+    </div>
+
+    <!-- Carga de Scripts del Juego y Chat -->
     <script src="../js/ia-engine.js"></script>
     <script src="../js/game-logic.js"></script>
-        <!-- Al final de games.html -->
-    <script src="../js/games-hub.js"></script>
-</body>
-
 </body>
 </html>
