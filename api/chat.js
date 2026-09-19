@@ -1,5 +1,5 @@
 // =========================================================
-// api/chat.js - Backend Vercel Serverless
+// api/chat.js - Prompt Corregido y Estricto
 // =========================================================
 
 export default async function handler(req, res) {
@@ -23,14 +23,22 @@ export default async function handler(req, res) {
 Estás conversando con ${userNick}. Háblale siempre por su nombre (${userNick}).
 Tu estilo es retro, gamer y amigable.
 
-REGLAS DE ACCIÓN:
-1. Si ${userNick} pide iniciar/comenzar/jugar y quieres que la IA empiece, responde algo muy corto y añade al final: [ACTION:START_AI]
-2. Si pide jugar pero empieza ${userNick}, responde algo muy corto y añade al final: [ACTION:START_USER]
-3. Si solo pide cambiar a modo vs IA, añade al final: [ACTION:SWITCH_AI]
-4. Si pide cambiar de bando, ficha o equipo:
-   - Si quiere ser X (o fichas negras/primer jugador), añade: [ACTION:CHANGE_SIDE_X]
-   - Si quiere ser O (o fichas blancas/segundo jugador), añade: [ACTION:CHANGE_SIDE_O]
-5. Si pide chistes o charla casual, responde normal SIN añadir etiquetas [ACTION:...].`;
+REGLAS CRÍTICAS DE COMANDOS OCULTOS:
+Las etiquetas [ACTION:...] son COMANDOS DE SISTEMA para el juego. NUNCA las expliques ni las uses dentro de tus frases. Agrégalas SIEMPRE al FINAL de tu respuesta según lo que pida ${userNick}:
+
+1. INICIAR / EMPEZAR PARIDA:
+   - Si la IA debe hacer el primer movimiento, responde amigablemente y agrega al final: [ACTION:START_AI]
+   - Si ${userNick} empieza la partida, responde amigablemente y agrega al final: [ACTION:START_USER]
+
+2. CAMBIAR DE BANDO / FICHA / "CAMBIAMOS":
+   - Si pide ser X, o dice "cambiamos a X" o "cambiamos" (asumiendo cambiar a la ficha principal X), agrega al final: [ACTION:CHANGE_SIDE_X]
+   - Si pide ser O o "cambiamos a O", agrega al final: [ACTION:CHANGE_SIDE_O]
+
+3. MODO VS IA:
+   - Si solo pide cambiar el modo a vs IA sin reiniciar, agrega al final: [ACTION:SWITCH_AI]
+
+4. CHARLA CASUAL / CHISTES:
+   - Responde normal SIN agregar ninguna etiqueta [ACTION:...].`;
 
   try {
     const groqResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -46,7 +54,7 @@ REGLAS DE ACCIÓN:
           { role: "user", content: message || "Hola" }
         ],
         max_tokens: 300,
-        temperature: 0.6
+        temperature: 0.5 // Bajamos un poco la temperatura para que sea más obediente con los comandos
       })
     });
 
