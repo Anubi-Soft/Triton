@@ -1,46 +1,28 @@
-<div class="main-workspace">
-    
-    <!-- CAJÓN DE JUEGOS (Cubre todo al inicio) -->
-    <div id="app-drawer" class="app-drawer">
-        <h3 class="drawer-title">🎮 Galería de Minijuegos</h3>
-        <div class="games-grid">
-            <!-- Al hacer clic abre tateti.html -->
-            <div class="game-card" onclick="launchGame('/games/tateti.html')">
-                <div class="game-icon">❌⭕</div>
-                <span>Ta-Te-Ti AI</span>
-            </div>
-            
-            <div class="game-card locked">
-                <div class="game-icon">🐍</div>
-                <span>Próximamente</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- ÁREA DEL JUEGO ACTIVO (Se ve al elegir un juego) -->
-    <div class="game-viewport">
-        <button id="btn-back" class="btn-retro-back hidden" onclick="closeGame()">
-            ⬅️ Volver al Menú
-        </button>
-        <iframe id="game-frame" class="game-frame hidden" src="about:blank"></iframe>
-    </div>
-
-    <!-- CHAT DE LA SALA (Queda debajo del iframe al jugar) -->
-    <div class="chat-section">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <span class="chat-title">💬 Chat de la Sala</span>
-            <input type="text" id="player-name" class="select-style cyan-placeholder" style="width: 120px; font-size: 12px; padding: 3px 6px;" placeholder="Aquí tu Nick...">
-        </div>
+<!-- CAJÓN DE JUEGOS -->
+<div id="app-drawer" class="app-drawer">
+    <h3 class="drawer-title">🎮 Galería de Minijuegos</h3>
+    <div class="games-grid">
         
-        <div id="chat-history" class="chat-box">
-            <div class="chat-welcome">¡Bienvenido! Hablá con tu rival o la IA...</div>
-        </div>
-
-        <div class="chat-input-wrapper">
-            <input type="text" id="chat-input" class="chat-input" placeholder="Escribí un mensaje..." onkeypress="if(event.key==='Enter') sendMessage()">
-            <button class="btn-send" onclick="sendMessage()">Enviar</button>
+        <!-- Tarjeta como Botón Accesible y Táctil -->
+        <button id="btn-tateti" class="game-card" type="button">
+            <div class="game-icon">❌⭕</div>
+            <span>Ta-Te-Ti AI</span>
+        </button>
+        
+        <div class="game-card locked">
+            <div class="game-icon">🐍</div>
+            <span>Próximamente</span>
         </div>
     </div>
-
 </div>
+
+<!-- ÁREA DEL JUEGO ACTIVO -->
+<div class="game-viewport">
+    <button id="btn-back" class="btn-retro-back hidden" type="button">
+        ⬅️ Volver al Menú
+    </button>
+    <iframe id="game-frame" class="game-frame hidden" src="about:blank"></iframe>
+</div>
+
+<!-- Cargar el script justo al final -->
 <script src="js/games-hub.js"></script>
