@@ -33,17 +33,19 @@ function loadModule(tabName, fileUrl, containerId, callback) {
         });
 }
 
-// Hook llamado desde switchTab
+
+// js/loader.js - Ajuste en checkAndLoadModule
+
 function checkAndLoadModule(tabId) {
-    // Si salimos de noticias hacia otra pestaña, limpiamos el hash de la noticia para no trabar el router
     if (tabId !== 'news' && window.location.hash.startsWith('#news/')) {
         history.replaceState(null, "", window.location.pathname);
     }
 
     if (tabId === 'games') {
         loadModule('games', 'games.html', 'games-container', () => {
-            if (typeof resetGame === 'function') {
-                resetGame();
+            // Inicializar/vincular eventos del Hub cuando el HTML ya está cargado en el DOM
+            if (typeof window.initGamesHub === 'function') {
+                window.initGamesHub();
             }
         });
     } else if (tabId === 'news') {
