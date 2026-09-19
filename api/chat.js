@@ -1,5 +1,5 @@
 // =========================================================
-// api/chat.js - Prompt Corregido y Estricto
+// api/chat.js
 // =========================================================
 
 export default async function handler(req, res) {
@@ -23,22 +23,17 @@ export default async function handler(req, res) {
 Estás conversando con ${userNick}. Háblale siempre por su nombre (${userNick}).
 Tu estilo es retro, gamer y amigable.
 
-REGLAS CRÍTICAS DE COMANDOS OCULTOS:
-Las etiquetas [ACTION:...] son COMANDOS DE SISTEMA para el juego. NUNCA las expliques ni las uses dentro de tus frases. Agrégalas SIEMPRE al FINAL de tu respuesta según lo que pida ${userNick}:
-
-1. INICIAR / EMPEZAR PARIDA:
-   - Si la IA debe hacer el primer movimiento, responde amigablemente y agrega al final: [ACTION:START_AI]
-   - Si ${userNick} empieza la partida, responde amigablemente y agrega al final: [ACTION:START_USER]
-
-2. CAMBIAR DE BANDO / FICHA / "CAMBIAMOS":
-   - Si pide ser X, o dice "cambiamos a X" o "cambiamos" (asumiendo cambiar a la ficha principal X), agrega al final: [ACTION:CHANGE_SIDE_X]
-   - Si pide ser O o "cambiamos a O", agrega al final: [ACTION:CHANGE_SIDE_O]
-
-3. MODO VS IA:
-   - Si solo pide cambiar el modo a vs IA sin reiniciar, agrega al final: [ACTION:SWITCH_AI]
-
-4. CHARLA CASUAL / CHISTES:
-   - Responde normal SIN agregar ninguna etiqueta [ACTION:...].`;
+REGLAS OBLIGATORIAS:
+1. SIEMPRE escribe una frase corta con buena onda ANTES de poner cualquier etiqueta. NUNCA respondas únicamente con la etiqueta.
+2. Comandos al final del texto:
+   - Si pide iniciar / reiniciar / empezar ("inicia", "reinicia", "jugar"):
+     * Si la IA empieza: responde una frase corta + [ACTION:START_AI]
+     * Si ${userNick} empieza: responde una frase corta + [ACTION:START_USER]
+   - Si pide cambiar de bando / ficha ("cambiamos", "cambiar a X", "quiero ser O"):
+     * Si pide ser X: [ACTION:CHANGE_SIDE_X]
+     * Si pide ser O: [ACTION:CHANGE_SIDE_O]
+     * Si solo dice "cambiamos": [ACTION:TOGGLE_SIDE]
+3. En charla normal o chistes, responde sin etiquetas [ACTION:...].`;
 
   try {
     const groqResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -54,7 +49,7 @@ Las etiquetas [ACTION:...] son COMANDOS DE SISTEMA para el juego. NUNCA las expl
           { role: "user", content: message || "Hola" }
         ],
         max_tokens: 300,
-        temperature: 0.5 // Bajamos un poco la temperatura para que sea más obediente con los comandos
+        temperature: 0.6
       })
     });
 
@@ -65,7 +60,7 @@ Las etiquetas [ACTION:...] son COMANDOS DE SISTEMA para el juego. NUNCA las expl
       return res.status(200).json({ reply: `[Error Groq]: ${detail}` });
     }
 
-    const reply = data.choices?.[0]?.message?.content?.trim() || "¡Llegó una respuesta vacía!";
+    const reply = data.choices?.[0]?.message?.content?.trim() || "¡Listo para jugar!";
     return res.status(200).json({ reply });
 
   } catch (err) {
