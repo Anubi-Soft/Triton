@@ -88,6 +88,45 @@ window.onGameModeChange = function(mode, difficulty) {
     initCheckers(); // Reinicia el tablero al cambiar de modo
 };
 
+// =========================================================
+// js/checkers-logic.js - Implementando los handlers del Framework
+// =========================================================
+
+// 1. La IA debe comenzar jugando (ej. Negras)
+window.onStartAI = function() {
+    turn = 'B'; // 'B' = Negras / IA
+    renderBoard();
+    
+    // Si la IA arranca, ejecuta su primer movimiento
+    if (typeof makeAIMove === 'function') {
+        setTimeout(makeAIMove, 600);
+    }
+};
+
+// 2. El usuario comienza jugando (ej. Rojas)
+window.onStartUser = function() {
+    turn = 'R'; // 'R' = Rojas / Jugador
+    renderBoard();
+};
+
+// 3. Cambiar bando o colores
+window.onToggleSide = function(actionTag) {
+    // Intercambiar fichas/bando actual
+    turn = (turn === 'R') ? 'B' : 'R';
+    renderBoard();
+    
+    if (turn === 'B' && typeof makeAIMove === 'function') {
+        setTimeout(makeAIMove, 600);
+    }
+};
+
+// 4. Reiniciar partida
+window.onResetGame = function() {
+    if (typeof initCheckers === 'function') {
+        initCheckers();
+    }
+};
+
 
 // Iniciar al cargar
 document.addEventListener("DOMContentLoaded", initCheckers);
