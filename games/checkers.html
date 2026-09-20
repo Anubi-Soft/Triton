@@ -20,12 +20,46 @@
             .game-layout { grid-template-columns: 1fr 1fr; align-items: start; }
         }
 
+        /* Layout con laterales para fichas comidas */
+        .board-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 10px auto;
+        }
+
+        /* Pilas laterales tipo Tragaperras / Casino */
+        .captured-stack {
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            justify-content: flex-start;
+            width: 22px;
+            height: 280px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 4px 2px;
+            box-sizing: border-box;
+        }
+
+        .captured-piece {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 1px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: -10px; /* Efecto encimado */
+        }
+        .captured-piece.red { background: #ff4444; }
+        .captured-piece.black { background: #333; border-color: #777; }
+
         #checkers-board {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
             width: 280px;
             height: 280px;
-            margin: 10px auto;
             border: 2px solid var(--accent-color, #00ffcc);
             border-radius: 4px;
         }
@@ -34,7 +68,17 @@
         .square.dark { background: rgba(0,0,0,0.5); }
         .square.light { background: rgba(255,255,255,0.1); }
 
-        .piece { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #fff; }
+        .piece { 
+            width: 26px; 
+            height: 26px; 
+            border-radius: 50%; 
+            border: 2px solid #fff; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            user-select: none;
+        }
         .piece-r { background: #ff4444; }
         .piece-b { background: #333; }
         .piece.selected { border-color: #00ffcc; box-shadow: 0 0 8px #00ffcc; }
@@ -42,7 +86,9 @@
         @media (max-width: 768px) {
             #checkers-board { width: 240px; height: 240px; }
             .square { width: 30px; height: 30px; }
-            .piece { width: 22px; height: 22px; }
+            .piece { width: 22px; height: 22px; font-size: 0.65rem; }
+            .captured-stack { height: 240px; width: 18px; }
+            .captured-piece { width: 14px; height: 14px; margin-bottom: -8px; }
         }
     </style>
 </head>
@@ -58,7 +104,12 @@
 
             <p id="game-status" style="margin: 6px 0; font-weight: bold;">Turno de: Rojas</p>
             
-            <div id="checkers-board"></div>
+            <!-- Contenedor con pilas de fichas comidas a los laterales -->
+            <div class="board-container">
+                <div id="captured-red" class="captured-stack" title="Rojas comidas"></div>
+                <div id="checkers-board"></div>
+                <div id="captured-black" class="captured-stack" title="Negras comidas"></div>
+            </div>
             
             <button class="btn-reset" onclick="initCheckers()" style="padding: 4px 12px; margin-top: 5px;">Reiniciar Partida</button>
         </div>
@@ -85,15 +136,16 @@
 
     <!-- Scripts de Modos, Chat y Lógica -->
     <script src="../js/frameworks/games/mode-manager.js"></script>
-   <script src="../js/frameworks/games/game-actions.js"></script>
-   <script src="../js/frameworks/games/game-logic.js"></script>
-  <!-- En games/checkers.html -->
-<script src="../js/games/checkers.js"></script>
+    <script src="../js/frameworks/games/game-actions.js"></script>
+    <script src="../js/frameworks/games/game-logic.js"></script>
+    <script src="../js/games/checkers.js"></script>
   
     <script>
         // Inyectar el selector al cargar
         document.addEventListener("DOMContentLoaded", () => {
-            GameModeManager.renderSelector('mode-selector-container');
+            if (window.GameModeManager) {
+                GameModeManager.renderSelector('mode-selector-container');
+            }
         });
     </script>
 </body>
