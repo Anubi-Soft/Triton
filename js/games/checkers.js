@@ -1,16 +1,19 @@
 // =========================================================
-// js/checkers-logic.js - Lógica e IA Completa para Damas Retro
+// js/checkers-logic.js - Lógica, Reyes, Capturas y UI Casino
 // =========================================================
 
 let board = [];
 let selectedPiece = null;
-let turn = 'R';        // 'R' = Rojas (Jugador), 'B' = Negras (IA)
-let aiColor = 'B';     // Color asignado a AnubiBot
-let userColor = 'R';   // Color asignado al Jugador humano
+let turn = 'R';        // 'R' = Rojas, 'B' = Negras
+let aiColor = 'B';     
+let userColor = 'R';   
 let isGameActive = true;
 
+// Contadores de fichas capturadas
+let capturedRedCount = 0;
+let capturedBlackCount = 0;
+
 function initCheckers() {
-    // 'R' / 'B' = Fichas Normales. 'RK' / 'BK' = Reyes/Damas
     board = [
         ['','B','','B','','B','','B'],
         ['B','','B','','B','','B',''],
@@ -23,18 +26,19 @@ function initCheckers() {
     ];
     selectedPiece = null;
     isGameActive = true;
+    capturedRedCount = 0;
+    capturedBlackCount = 0;
 
     turn = 'R'; 
     updateCheckersStatus();
     renderBoard();
+    updateCapturedUI();
     checkAITurn();
 }
 
 function updateCheckersStatus() {
     const statusElem = document.getElementById('game-status');
-    if (!statusElem) return;
-
-    if (!isGameActive) return;
+    if (!statusElem || !isGameActive) return;
 
     const playerName = (typeof getPlayerName === "function") ? getPlayerName() : "Jugador";
     const turnName = (turn === userColor) ? playerName : "AnubiBot 🤖";
@@ -57,7 +61,7 @@ function renderBoard() {
             if (cellValue !== '') {
                 const piece = document.createElement('div');
                 const isKing = cellValue.includes('K');
-                const baseColor = cellValue.charAt(0).toLowerCase(); // 'r' o 'b'
+                const baseColor = cellValue.charAt(0).toLowerCase();
                 
                 piece.className = `piece piece-${baseColor}${isKing ? ' king' : ''}`;
                 if (isKing) piece.innerText = '👑';
@@ -74,6 +78,30 @@ function renderBoard() {
     }
 }
 
+// Renderiza las pilas laterales de fichas comidas (Efecto Tragaperras)
+function updateCapturedUI() {
+    const redStack = document.getElementById('captured-red');
+    const blackStack = document.getElementById('captured-black');
+
+    if (redStack) {
+        redStack.innerHTML = '';
+        for (let i = 0; i < capturedRedCount; i++) {
+            const p = document.createElement('div');
+            p.className = 'captured-piece red';
+            redStack.appendChild(p);
+        }
+    }
+
+    if (blackStack) {
+        blackStack.innerHTML = '';
+        for (let i = 0; i < capturedBlackCount; i++) {
+            const p = document.createElement('div');
+            p.className = 'captured-piece black';
+            blackStack.appendChild(p);
+        }
+    }
+}
+
 function handleSquareClick(r, c) {
     if (!isGameActive) return;
 
@@ -81,14 +109,14 @@ function handleSquareClick(r, c) {
     const isPVE = modeElem && modeElem.value === 'pve';
     if (isPVE && turn === aiColor) return;
 
-    // Seleccionar pieza propia (compara si coincide la letra inicial del color 'R' o 'B')
+    // Seleccionar pieza propia (compara la letra inicial 'R' o 'B')
     if (board[r][c] !== '' && board[r][c].charAt(0) === turn) {
         selectedPiece = { r, c };
         renderBoard();
         return;
     }
 
-    // Intentar mover pieza seleccionada a casillero vacío
+    // Mover pieza a casillero vacío
     if (selectedPiece && board[r][c] === '') {
         if (executeMove(selectedPiece.r, selectedPiece.c, r, c)) {
             selectedPiece = null;
@@ -114,19 +142,24 @@ function executeMove(fromR, fromC, toR, toC) {
         return true;
     }
 
-    // 2. Movimiento de Captura / "Comer" (2 casillas en diagonal)
+    // 2. Captura / "Comer" (2 casillas en diagonal)
     const validJumpDirection = isKing || (color === 'R' && rowDiff === -2) || (color === 'B' && rowDiff === 2);
     if (validJumpDirection && colDiff === 2 && Math.abs(rowDiff) === 2) {
         const midR = (fromR + toR) / 2;
         const midC = (fromC + toC) / 2;
         const midPiece = board[midR][midC];
 
-        // Verificar que en la casilla intermedia haya una ficha enemiga
         if (midPiece !== '' && midPiece.charAt(0) !== color) {
+            // Incrementar contador de fichas comidas
+            if (midPiece.charAt(0) === 'R') capturedRedCount++;
+            if (midPiece.charAt(0) === 'B') capturedBlackCount++;
+
             board[toR][toC] = piece;
             board[fromR][fromC] = '';
-            board[midR][midC] = ''; // Remover pieza comida
+            board[midR][midC] = ''; // Quitar la ficha
+            
             checkKingCoronation(toR, toC);
+            updateCapturedUI();
             return true;
         }
     }
@@ -159,15 +192,15 @@ function checkAITurn() {
 }
 
 // =========================================================
-// Motor de Movimiento e IA para Damas Retro
+// IA y Búsqueda de Movimientos (Incluye Reyes)
 // =========================================================
+
 function makeAIMove() {
     if (!isGameActive || turn !== aiColor) return;
 
     const allMoves = getAllValidMovesForColor(aiColor);
 
     if (allMoves.length > 0) {
-        // Priorizar movimientos de captura ("comer")
         const captureMoves = allMoves.filter(m => m.isCapture);
         const selectedMove = captureMoves.length > 0 
             ? captureMoves[Math.floor(Math.random() * captureMoves.length)]
@@ -188,11 +221,11 @@ function getAllValidMovesForColor(color) {
 
     for (let r = 0; r < 8; r++) {
         for (let c = 0; c < 8; c++) {
-            if (board[r][c] !== '' && board[r][c].charAt(0) === color) {
-                const piece = board[r][c];
+            const piece = board[r][c];
+            // CORRECCIÓN CLAVE: Verificar la letra inicial para incluir 'R', 'RK', 'B', 'BK'
+            if (piece !== '' && piece.charAt(0) === color) {
                 const isKing = piece.includes('K');
                 
-                // Direcciones a chequear
                 const directions = [];
                 if (isKing || color === 'B') directions.push({ r: 1, c: -1 }, { r: 1, c: 1 });
                 if (isKing || color === 'R') directions.push({ r: -1, c: -1 }, { r: -1, c: 1 });
@@ -205,7 +238,7 @@ function getAllValidMovesForColor(color) {
                         moves.push({ fromR: r, fromC: c, toR: nr, toC: nc, isCapture: false });
                     }
 
-                    // Movimiento de Captura
+                    // Captura
                     const capR = r + (dir.r * 2);
                     const capC = c + (dir.c * 2);
                     const midR = r + dir.r;
@@ -224,48 +257,24 @@ function getAllValidMovesForColor(color) {
     return moves;
 }
 
-// =========================================================
-// Hooks para Framework y Comandos de Chat (GameActions)
-// =========================================================
-
+// Hooks Framework
 window.initCheckers = initCheckers;
 window.handleSquareClick = handleSquareClick;
 
 window.onStartAI = function() {
-    aiColor = 'R';    // IA juega con Rojas
-    userColor = 'B';  // Jugador juega con Negras
-    initCheckers();
+    aiColor = 'R'; userColor = 'B'; initCheckers();
 };
-
 window.onStartUser = function() {
-    aiColor = 'B';    // IA juega con Negras
-    userColor = 'R';  // Jugador juega con Rojas
-    initCheckers();
+    aiColor = 'B'; userColor = 'R'; initCheckers();
 };
-
 window.onChangeSide = function(side) {
-    if (side === 'X' || side === 'R') {
-        window.onStartUser();
-    } else {
-        window.onStartAI();
-    }
+    if (side === 'X' || side === 'R') window.onStartUser(); else window.onStartAI();
 };
-
 window.onToggleSide = function() {
-    if (userColor === 'R') {
-        window.onStartAI();
-    } else {
-        window.onStartUser();
-    }
+    if (userColor === 'R') window.onStartAI(); else window.onStartUser();
 };
-
-window.onResetGame = function() {
-    initCheckers();
-};
-
-window.onGameModeChange = function(mode, difficulty) {
-    initCheckers();
-};
+window.onResetGame = function() { initCheckers(); };
+window.onGameModeChange = function() { initCheckers(); };
 
 function checkGameOver() {
     const pveMode = document.getElementById('game-mode')?.value === 'pve';
@@ -274,36 +283,12 @@ function checkGameOver() {
     const redMoves = getAllValidMovesForColor('R');
     const blackMoves = getAllValidMovesForColor('B');
 
-    if (redMoves.length === 0) {
+    if (redMoves.length === 0 || blackMoves.length === 0) {
         isGameActive = false;
-        const winner = (userColor === 'B') ? playerName : "AnubiBot";
-        updateStatus(`¡Sin movimientos! Ganador: ${winner}`);
-        
-        if (pveMode && typeof appendChatMessage === "function") {
-            if (userColor === 'B') {
-                appendChatMessage("AnubiBot", `¡Increíble estrategia, ${playerName}! 🏆 Ganaste la partida.`);
-            } else {
-                appendChatMessage("AnubiBot", `¡Punto para AnubiBot! 🤖 Buen intento, ${playerName}. ¿Echamos la revancha?`);
-            }
-        }
+        const winner = (redMoves.length > 0) ? "Rojas" : "Negras";
+        updateStatus(`¡Fin de la partida! Ganador: ${winner}`);
         return true;
     }
-
-    if (blackMoves.length === 0) {
-        isGameActive = false;
-        const winner = (userColor === 'R') ? playerName : "AnubiBot";
-        updateStatus(`¡Sin movimientos! Ganador: ${winner}`);
-
-        if (pveMode && typeof appendChatMessage === "function") {
-            if (userColor === 'R') {
-                appendChatMessage("AnubiBot", `¡Felicitaciones, ${playerName}! 🎉 Te quedaste con todo el tablero.`);
-            } else {
-                appendChatMessage("AnubiBot", `¡Ganó la IA! 🤖 ¡Probemos de nuevo cuando quieras!`);
-            }
-        }
-        return true;
-    }
-
     return false;
 }
 
