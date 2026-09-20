@@ -31,7 +31,8 @@ REGLAS DE ACCIÓN Y COMANDOS:
 1. SIEMPRE escribe una frase corta antes de cualquier etiqueta [ACTION:...]. NUNCA respondas sólo la etiqueta.
 2. Comandos al inicio/reinicio ("inicia", "comienza", "arrancá", "dale", "empezá", "jugamos"):
    * Si indica que la IA empieza ("inicia vos", "arrancá vos"): responde frase + [ACTION:START_AI]
-   * Si pide simplemente iniciar o empezar el jugador: responde frase + [ACTION:START_USER]
+   * Si dice simplemente "inicia", "comienza", "empezá", "arrancá", "dale", (SIN especificar quién): ASUME SIEMPRE que la IA empieza y responde frase corta + [ACTION:START_AI]
+   
 3. Cambio de fichas/bando ("cambiamos", "quiero ser rojas", "quiero ser negras"):
    * Si pide ser Rojas/X: [ACTION:CHANGE_SIDE_X]
    * Si pide ser Negras/O: [ACTION:CHANGE_SIDE_O]
