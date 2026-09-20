@@ -74,7 +74,7 @@ function checkWinner() {
         [0,4,8], [2,4,6]
     ];
 
-    const playerName = getPlayerName();
+    const playerName = (typeof getPlayerName === "function") ? getPlayerName() : "Jugador";
 
     for (let condition of winConditions) {
         const [a, b, c] = condition;
@@ -84,10 +84,14 @@ function checkWinner() {
 
             if (winnerSymbol === playerSymbol) {
                 updateStatus(`¡Ganador: ${playerName} (${playerSymbol})! 🎉`);
-                appendChatMessage("AnubiBot", `¡Increíble jugada, ${playerName}! 🎮 Me ganaste esta ronda. ¿Echamos otra partida?`);
+                if (typeof appendChatMessage === "function") {
+                    appendChatMessage("AnubiBot", `¡Increíble jugada, ${playerName}! 🎮 Me ganaste esta ronda. ¿Echamos otra partida?`);
+                }
             } else {
                 updateStatus(`¡Ganador: AnubiBot (${aiSymbol})! 🎉`);
-                appendChatMessage("AnubiBot", `¡Punto para la IA! 🤖 Buena partida, ${playerName}. ¿Quieres la revancha?`);
+                if (typeof appendChatMessage === "function") {
+                    appendChatMessage("AnubiBot", `¡Punto para la IA! 🤖 Buena partida, ${playerName}. ¿Quieres la revancha?`);
+                }
             }
             return true;
         }
@@ -96,7 +100,9 @@ function checkWinner() {
     if (!boardState.includes("")) {
         updateStatus("¡Empate! 🤝");
         isGameActive = false;
-        appendChatMessage("AnubiBot", `¡Un empate muy ajustado, ${playerName}! ⚔️ Estuvo muy parejo. ¿Jugamos el desempate?`);
+        if (typeof appendChatMessage === "function") {
+            appendChatMessage("AnubiBot", `¡Un empate muy ajustado, ${playerName}! ⚔️ Estuvo muy parejo. ¿Jugamos el desempate?`);
+        }
         return true;
     }
 
@@ -108,7 +114,8 @@ function resetGame(startingPlayer = playerSymbol) {
     currentPlayer = startingPlayer;
     isGameActive = true;
 
-    const startText = currentPlayer === playerSymbol ? getPlayerName() : "AnubiBot";
+    const playerName = (typeof getPlayerName === "function") ? getPlayerName() : "Jugador";
+    const startText = currentPlayer === playerSymbol ? playerName : "AnubiBot";
     updateStatus(`Turno de: ${startText} (${currentPlayer})`);
     updateBoardUI();
 }
@@ -118,9 +125,28 @@ function updateStatus(text) {
     if (statusElem) statusElem.innerText = text;
 }
 
+function onModeChange() {
+    const modeElem = document.getElementById("game-mode");
+    const diffContainer = document.getElementById("difficulty-container");
+    if (modeElem && diffContainer) {
+        if (modeElem.value === "pve") {
+            diffContainer.style.display = "block";
+            diffContainer.classList.remove("hidden");
+        } else {
+            diffContainer.style.display = "none";
+            diffContainer.classList.add("hidden");
+        }
+    }
+    resetGame(playerSymbol);
+}
+
 // =========================================================
-// Hooks para el Framework (GameActions / AnubiBot)
+// Hooks para el Framework (GameActions / AnubiBot) & Globales
 // =========================================================
+
+window.makeMove = makeMove;
+window.resetGame = resetGame;
+window.onModeChange = onModeChange;
 
 window.onStartAI = function() {
     playerSymbol = "O";
@@ -157,8 +183,8 @@ window.onResetGame = function() {
 };
 
 window.onGameModeChange = function(mode, difficulty) {
-    resetGame(playerSymbol);
+    onModeChange();
 };
 
-// Iniciar al cargar
+// Iniciar al cargar la página
 document.addEventListener("DOMContentLoaded", initTateti);
