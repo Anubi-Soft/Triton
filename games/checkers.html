@@ -21,10 +21,15 @@
             <p id="game-status" style="margin: 6px 0; font-weight: bold;">Turno de: Rojas</p>
             
             <!-- Checkbox de regla personalizada -->
-            <div class="rules-option">
-                <input type="checkbox" id="allow-orthogonal" onchange="toggleOrthogonalRules(this.checked)">
-                <label for="allow-orthogonal">Habilitar mov. recto (Rey Arcade/Chinas)</label>
-            </div>
+            <!-- Checkbox de regla personalizada estilizado -->
+<div class="rules-option">
+    <label class="custom-checkbox-container" for="allow-orthogonal">
+        <input type="checkbox" id="allow-orthogonal" onchange="toggleOrthogonalRules(this.checked)">
+        <span class="checkbox-mark"></span>
+        Habilitar mov. recto (Rey Arcade/Chinas)
+    </label>
+</div>
+
 
             <!-- Contenedor con pilas de fichas comidas a los laterales -->
             <div class="board-container">
