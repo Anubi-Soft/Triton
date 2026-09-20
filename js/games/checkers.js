@@ -133,9 +133,10 @@ function executeMove(fromR, fromC, toR, toC) {
     const rowDiff = toR - fromR;
     const colDiff = Math.abs(toC - fromC);
     
+    let isCaptureMove = false;
+
     if (!isKing) {
         // --- MOVIMIENTO DE PEÓN NORMAL ---
-        // 1. Movimiento Simple
         const validDirection = (color === 'R' && rowDiff === -1) || (color === 'B' && rowDiff === 1);
         if (validDirection && colDiff === 1 && Math.abs(rowDiff) === 1) {
             board[toR][toC] = piece;
@@ -144,7 +145,6 @@ function executeMove(fromR, fromC, toR, toC) {
             return true;
         }
 
-        // 2. Captura (Comer)
         const validJumpDirection = (color === 'R' && rowDiff === -2) || (color === 'B' && rowDiff === 2);
         if (validJumpDirection && colDiff === 2 && Math.abs(rowDiff) === 2) {
             const midR = (fromR + toR) / 2;
@@ -160,12 +160,12 @@ function executeMove(fromR, fromC, toR, toC) {
                 board[midR][midC] = '';
                 checkKingCoronation(toR, toC);
                 updateCapturedUI();
-                return true;
+                isCaptureMove = true;
             }
         }
     } else {
-        // --- MOVIMIENTO DE DAMA VOLADORA (REY) ---
-        if (colDiff !== Math.abs(rowDiff)) return false; // Solo diagonales
+        // --- MOVIMIENTO DE REY (Dama Voladora en Diagonales) ---
+        if (colDiff !== Math.abs(rowDiff)) return false; // Diagonales
         
         const distance = Math.abs(rowDiff);
         const dirR = Math.sign(toR - fromR);
@@ -174,41 +174,93 @@ function executeMove(fromR, fromC, toR, toC) {
         let enemiesInPath = 0;
         let enemyR = -1, enemyC = -1;
         
-        // Recorrer la diagonal buscando obstáculos
         for (let i = 1; i < distance; i++) {
             let r = fromR + i * dirR;
             let c = fromC + i * dirC;
             let p = board[r][c];
             
             if (p !== '') {
-                if (p.charAt(0) === color) return false; // Choca con pieza propia
+                if (p.charAt(0) === color) return false; // Bloqueado por ficha propia
                 enemiesInPath++;
                 enemyR = r;
                 enemyC = c;
             }
         }
         
-        // Si no hay enemigos en el medio, es un movimiento largo simple
         if (enemiesInPath === 0) {
             board[toR][toC] = piece;
             board[fromR][fromC] = '';
             return true;
-        } 
-        // Si hay exactamente 1 enemigo, lo come y aterriza más allá
-        else if (enemiesInPath === 1) {
+        } else if (enemiesInPath === 1) {
             const midPiece = board[enemyR][enemyC];
             if (midPiece.charAt(0) === 'R') capturedRedCount++;
             if (midPiece.charAt(0) === 'B') capturedBlackCount++;
             
             board[toR][toC] = piece;
             board[fromR][fromC] = '';
-            board[enemyR][enemyC] = ''; // Elimina la ficha comida
+            board[enemyR][enemyC] = '';
             updateCapturedUI();
-            return true;
+            isCaptureMove = true;
+        }
+    }
+
+    // --- COMPROBAR CAPTURA MÚLTIPLE (Si comió, verificar si puede seguir comiendo) ---
+    if (isCaptureMove) {
+        const canEatMore = checkMoreCapturesAvailable(toR, toC, color, isKing || board[toR][toC].includes('K'));
+        if (canEatMore) {
+            // Mantiene la selección en la ficha para que el jugador o la IA sigan comiendo
+            selectedPiece = { r: toR, c: toC };
+            renderBoard();
+            return false; // Retorna false para no cambiar de turno aún
+        }
+        return true; // No hay más para comer, finaliza el turno
+    }
+
+    return false;
+}
+
+// Función auxiliar para detectar si hay más fichas para comer desde la nueva posición
+function checkMoreCapturesAvailable(r, c, color, isKing) {
+    const directions = isKing 
+        ? [{r:1,c:1}, {r:1,c:-1}, {r:-1,c:1}, {r:-1,c:-1}]
+        : (color === 'R' ? [{r:-2,c:-2}, {r:-2,c:2}] : [{r:2,c:-2}, {r:2,c:2}]);
+
+    if (!isKing) {
+        for (let dir of directions) {
+            let midR = r + dir.r / 2;
+            let midC = c + dir.c / 2;
+            let toR = r + dir.r;
+            let toC = c + dir.c;
+
+            if (toR >= 0 && toR < 8 && toC >= 0 && toC < 8) {
+                if (board[toR][toC] === '' && board[midR][midC] !== '' && board[midR][midC].charAt(0) !== color) {
+                    return true;
+                }
+            }
+        }
+    } else {
+        for (let dir of directions) {
+            let enemyFound = false;
+            for (let i = 1; i < 8; i++) {
+                let nr = r + dir.r * i;
+                let nc = c + dir.c * i;
+                if (nr < 0 || nr >= 8 || nc < 0 || nc >= 8) break;
+
+                let target = board[nr][nc];
+                if (target === '') {
+                    if (enemyFound) return true; // Encontró enemigo y espacio detrás para aterrizar
+                } else if (target.charAt(0) === color) {
+                    break;
+                } else {
+                    if (enemyFound) break;
+                    enemyFound = true;
+                }
+            }
         }
     }
     return false;
 }
+
 
 function checkKingCoronation(r, c) {
     const piece = board[r][c];
