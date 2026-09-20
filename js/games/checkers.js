@@ -125,6 +125,13 @@ function handleSquareClick(r, c) {
     }
 }
 
+// Variable global para habilitar mov. recto
+let allowOrthogonalMoves = false;
+
+function toggleOrthogonalRules(enabled) {
+    allowOrthogonalMoves = enabled;
+}
+
 function executeMove(fromR, fromC, toR, toC) {
     const piece = board[fromR][fromC];
     const isKing = piece.includes('K');
@@ -132,13 +139,18 @@ function executeMove(fromR, fromC, toR, toC) {
 
     const rowDiff = toR - fromR;
     const colDiff = Math.abs(toC - fromC);
-    
+    const absRowDiff = Math.abs(rowDiff);
+
     let isCaptureMove = false;
+
+    // REGLA FUNDAMENTAL: El destino siempre debe ser un casillero oscuro (dark square)
+    // En un tablero de 8x8, los casilleros oscuros cumplen que (r + c) es impar (o par según la inicialización)
+    if ((toR + toC) % 2 === 0) return false; // Evita pisar casilleros claros
 
     if (!isKing) {
         // --- MOVIMIENTO DE PEÓN NORMAL ---
         const validDirection = (color === 'R' && rowDiff === -1) || (color === 'B' && rowDiff === 1);
-        if (validDirection && colDiff === 1 && Math.abs(rowDiff) === 1) {
+        if (validDirection && colDiff === 1 && absRowDiff === 1) {
             board[toR][toC] = piece;
             board[fromR][fromC] = '';
             checkKingCoronation(toR, toC);
@@ -146,7 +158,7 @@ function executeMove(fromR, fromC, toR, toC) {
         }
 
         const validJumpDirection = (color === 'R' && rowDiff === -2) || (color === 'B' && rowDiff === 2);
-        if (validJumpDirection && colDiff === 2 && Math.abs(rowDiff) === 2) {
+        if (validJumpDirection && colDiff === 2 && absRowDiff === 2) {
             const midR = (fromR + toR) / 2;
             const midC = (fromC + toC) / 2;
             const midPiece = board[midR][midC];
@@ -164,29 +176,32 @@ function executeMove(fromR, fromC, toR, toC) {
             }
         }
     } else {
-        // --- MOVIMIENTO DE REY (Dama Voladora en Diagonales) ---
-        if (colDiff !== Math.abs(rowDiff)) return false; // Diagonales
-        
-        const distance = Math.abs(rowDiff);
+        // --- MOVIMIENTO DE REY (Diagonales + Rectos opcionales en casillas oscuras) ---
+        const isDiagonal = absRowDiff === colDiff;
+        const isOrthogonal = (fromR === toR || fromC === toC);
+
+        if (!isDiagonal && !(allowOrthogonalMoves && isOrthogonal)) return false;
+
+        const distance = Math.max(absRowDiff, colDiff);
         const dirR = Math.sign(toR - fromR);
         const dirC = Math.sign(toC - fromC);
-        
+
         let enemiesInPath = 0;
         let enemyR = -1, enemyC = -1;
-        
+
         for (let i = 1; i < distance; i++) {
             let r = fromR + i * dirR;
             let c = fromC + i * dirC;
             let p = board[r][c];
-            
+
             if (p !== '') {
-                if (p.charAt(0) === color) return false; // Bloqueado por ficha propia
+                if (p.charAt(0) === color) return false; // Ficha propia bloquea
                 enemiesInPath++;
                 enemyR = r;
                 enemyC = c;
             }
         }
-        
+
         if (enemiesInPath === 0) {
             board[toR][toC] = piece;
             board[fromR][fromC] = '';
@@ -195,7 +210,7 @@ function executeMove(fromR, fromC, toR, toC) {
             const midPiece = board[enemyR][enemyC];
             if (midPiece.charAt(0) === 'R') capturedRedCount++;
             if (midPiece.charAt(0) === 'B') capturedBlackCount++;
-            
+
             board[toR][toC] = piece;
             board[fromR][fromC] = '';
             board[enemyR][enemyC] = '';
@@ -204,21 +219,20 @@ function executeMove(fromR, fromC, toR, toC) {
         }
     }
 
-    // --- COMPROBAR CAPTURA MÚLTIPLE (Si comió, verificar si puede seguir comiendo) ---
     if (isCaptureMove) {
         const canEatMore = checkMoreCapturesAvailable(toR, toC, color, isKing || board[toR][toC].includes('K'));
         if (canEatMore) {
-            // Mantiene la selección en la ficha para que el jugador o la IA sigan comiendo
             selectedPiece = { r: toR, c: toC };
             renderBoard();
-            return false; // Retorna false para no cambiar de turno aún
+            return false;
         }
-        return true; // No hay más para comer, finaliza el turno
+        return true;
     }
 
     return false;
 }
 
+                
 // Función auxiliar para detectar si hay más fichas para comer desde la nueva posición
 function checkMoreCapturesAvailable(r, c, color, isKing) {
     const directions = isKing 
