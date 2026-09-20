@@ -13,6 +13,13 @@ let isGameActive = true;
 let capturedRedCount = 0;
 let capturedBlackCount = 0;
 
+// Variable global para habilitar/deshabilitar movimientos rectos (ortogonales)
+let allowOrthogonalMoves = false;
+
+function toggleOrthogonalRules(enabled) {
+    allowOrthogonalMoves = enabled;
+}
+
 function initCheckers() {
     board = [
         ['','B','','B','','B','','B'],
@@ -78,7 +85,7 @@ function renderBoard() {
     }
 }
 
-// Renderiza las pilas laterales de fichas comidas (Efecto Tragaperras)
+// Renderiza las pilas laterales de fichas comidas
 function updateCapturedUI() {
     const redStack = document.getElementById('captured-red');
     const blackStack = document.getElementById('captured-black');
@@ -109,7 +116,7 @@ function handleSquareClick(r, c) {
     const isPVE = modeElem && modeElem.value === 'pve';
     if (isPVE && turn === aiColor) return;
 
-    // Seleccionar pieza propia (compara la letra inicial 'R' o 'B')
+    // Seleccionar pieza propia
     if (board[r][c] !== '' && board[r][c].charAt(0) === turn) {
         selectedPiece = { r, c };
         renderBoard();
@@ -125,13 +132,6 @@ function handleSquareClick(r, c) {
     }
 }
 
-// Variable global para habilitar mov. recto
-let allowOrthogonalMoves = false;
-
-function toggleOrthogonalRules(enabled) {
-    allowOrthogonalMoves = enabled;
-}
-
 function executeMove(fromR, fromC, toR, toC) {
     const piece = board[fromR][fromC];
     const isKing = piece.includes('K');
@@ -144,8 +144,7 @@ function executeMove(fromR, fromC, toR, toC) {
     let isCaptureMove = false;
 
     // REGLA FUNDAMENTAL: El destino siempre debe ser un casillero oscuro (dark square)
-    // En un tablero de 8x8, los casilleros oscuros cumplen que (r + c) es impar (o par según la inicialización)
-    if ((toR + toC) % 2 === 0) return false; // Evita pisar casilleros claros
+    if ((toR + toC) % 2 === 0) return false; 
 
     if (!isKing) {
         // --- MOVIMIENTO DE PEÓN NORMAL ---
@@ -232,7 +231,6 @@ function executeMove(fromR, fromC, toR, toC) {
     return false;
 }
 
-                
 // Función auxiliar para detectar si hay más fichas para comer desde la nueva posición
 function checkMoreCapturesAvailable(r, c, color, isKing) {
     const directions = isKing 
@@ -262,7 +260,7 @@ function checkMoreCapturesAvailable(r, c, color, isKing) {
 
                 let target = board[nr][nc];
                 if (target === '') {
-                    if (enemyFound) return true; // Encontró enemigo y espacio detrás para aterrizar
+                    if (enemyFound) return true;
                 } else if (target.charAt(0) === color) {
                     break;
                 } else {
@@ -274,7 +272,6 @@ function checkMoreCapturesAvailable(r, c, color, isKing) {
     }
     return false;
 }
-
 
 function checkKingCoronation(r, c) {
     const piece = board[r][c];
@@ -300,27 +297,8 @@ function checkAITurn() {
     }
 }
 
-// Variable global para habilitar/deshabilitar movimientos rectos (ortogonales)
-let allowOrthogonalMoves = false;
-
-function toggleOrthogonalRules(enabled) {
-    allowOrthogonalMoves = enabled;
-}
-
-// En la función donde el Rey valida sus diagonales:
-// Simplemente verificamos si es una diagonal pura O si el checkbox permite movimiento recto (misma fila o misma columna):
-function isValidKingDirection(fromR, fromC, toR, toC) {
-    const isDiagonal = Math.abs(toR - fromR) === Math.abs(toC - fromC);
-    const isOrthogonal = (fromR === toR || fromC === toC);
-    
-    if (isDiagonal) return true;
-    if (allowOrthogonalMoves && isOrthogonal) return true;
-    
-    return false;
-}
-
 // =========================================================
-// IA y Búsqueda de Movimientos (Incluye Reyes)
+// IA y Búsqueda de Movimientos
 // =========================================================
 
 function makeAIMove() {
@@ -344,7 +322,6 @@ function makeAIMove() {
     }
 }
 
-
 function getAllValidMovesForColor(color) {
     const moves = [];
 
@@ -355,18 +332,15 @@ function getAllValidMovesForColor(color) {
                 const isKing = piece.includes('K');
                 
                 if (!isKing) {
-                    // --- REGLAS IA PARA PEÓN NORMAL ---
                     const directions = [];
                     if (color === 'B') directions.push({ r: 1, c: -1 }, { r: 1, c: 1 });
                     if (color === 'R') directions.push({ r: -1, c: -1 }, { r: -1, c: 1 });
 
                     for (let dir of directions) {
-                        // Movimiento Simple
                         let nr = r + dir.r, nc = c + dir.c;
                         if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && board[nr][nc] === '') {
                             moves.push({ fromR: r, fromC: c, toR: nr, toC: nc, isCapture: false });
                         }
-                        // Captura
                         let capR = r + dir.r * 2, capC = c + dir.c * 2;
                         if (capR >= 0 && capR < 8 && capC >= 0 && capC < 8) {
                             let midPiece = board[nr][nc];
@@ -376,30 +350,27 @@ function getAllValidMovesForColor(color) {
                         }
                     }
                 } else {
-                    // --- REGLAS IA PARA DAMA VOLADORA (REY) ---
-                    const directions = [{r:1,c:1}, {r:1,c:-1}, {r:-1,c:1}, {r:-1,c:-1}];
+                    let directions = [{r:1,c:1}, {r:1,c:-1}, {r:-1,c:1}, {r:-1,c:-1}];
+                    if (allowOrthogonalMoves) {
+                        directions.push({r:1,c:0}, {r:-1,c:0}, {r:0,c:1}, {r:0,c:-1});
+                    }
                     
                     for (let dir of directions) {
                         let enemyFound = false;
-                        
-                        // Escanear la diagonal completa (hasta 7 casilleros)
                         for (let i = 1; i < 8; i++) {
                             let nr = r + dir.r * i;
                             let nc = c + dir.c * i;
-                            
-                            // Si sale del tablero, frenar en esta dirección
                             if (nr < 0 || nr >= 8 || nc < 0 || nc >= 8) break;
                             
                             let target = board[nr][nc];
                             
                             if (target === '') {
-                                // Casillero vacío: puede moverse o aterrizar tras comer
                                 moves.push({ fromR: r, fromC: c, toR: nr, toC: nc, isCapture: enemyFound });
                             } else if (target.charAt(0) === color) {
-                                break; // Topó con una pieza aliada, fin de esta diagonal
+                                break;
                             } else {
-                                if (enemyFound) break; // Ya encontró un enemigo antes, no puede saltar dos seguidos
-                                enemyFound = true;     // Encontró un enemigo para comer
+                                if (enemyFound) break;
+                                enemyFound = true;
                             }
                         }
                     }
@@ -410,39 +381,16 @@ function getAllValidMovesForColor(color) {
     return moves;
 }
 
-// Ejemplo para cuando cambie a modo MSN Messenger:
 function setMSNModeActive(isMSN) {
     const checkbox = document.getElementById('allow-orthogonal');
     if (checkbox) {
         checkbox.checked = false;
-        checkbox.disabled = isMSN; // Queda congelado en reglas estrictas de MSN
+        checkbox.disabled = isMSN;
         allowOrthogonalMoves = false;
     }
 }
 
-// Hooks Framework
-window.initCheckers = initCheckers;
-window.handleSquareClick = handleSquareClick;
-
-window.onStartAI = function() {
-    aiColor = 'R'; userColor = 'B'; initCheckers();
-};
-window.onStartUser = function() {
-    aiColor = 'B'; userColor = 'R'; initCheckers();
-};
-window.onChangeSide = function(side) {
-    if (side === 'X' || side === 'R') window.onStartUser(); else window.onStartAI();
-};
-window.onToggleSide = function() {
-    if (userColor === 'R') window.onStartAI(); else window.onStartUser();
-};
-window.onResetGame = function() { initCheckers(); };
-window.onGameModeChange = function() { initCheckers(); };
-
 function checkGameOver() {
-    const pveMode = document.getElementById('game-mode')?.value === 'pve';
-    const playerName = (typeof getPlayerName === "function") ? getPlayerName() : "Jugador";
-
     const redMoves = getAllValidMovesForColor('R');
     const blackMoves = getAllValidMovesForColor('B');
 
@@ -459,5 +407,25 @@ function updateStatus(text) {
     const statusElem = document.getElementById('game-status');
     if (statusElem) statusElem.innerText = text;
 }
+
+// Hooks Framework
+window.initCheckers = initCheckers;
+window.handleSquareClick = handleSquareClick;
+window.toggleOrthogonalRules = toggleOrthogonalRules;
+
+window.onStartAI = function() {
+    aiColor = 'R'; userColor = 'B'; initCheckers();
+};
+window.onStartUser = function() {
+    aiColor = 'B'; userColor = 'R'; initCheckers();
+};
+window.onChangeSide = function(side) {
+    if (side === 'X' || side === 'R') window.onStartUser(); else window.onStartAI();
+};
+window.onToggleSide = function() {
+    if (userColor === 'R') window.onStartAI(); else window.onStartUser();
+};
+window.onResetGame = function() { initCheckers(); };
+window.onGameModeChange = function() { initCheckers(); };
 
 document.addEventListener("DOMContentLoaded", initCheckers);
