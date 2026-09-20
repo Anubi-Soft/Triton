@@ -286,6 +286,25 @@ function checkAITurn() {
     }
 }
 
+// Variable global para habilitar/deshabilitar movimientos rectos (ortogonales)
+let allowOrthogonalMoves = false;
+
+function toggleOrthogonalRules(enabled) {
+    allowOrthogonalMoves = enabled;
+}
+
+// En la función donde el Rey valida sus diagonales:
+// Simplemente verificamos si es una diagonal pura O si el checkbox permite movimiento recto (misma fila o misma columna):
+function isValidKingDirection(fromR, fromC, toR, toC) {
+    const isDiagonal = Math.abs(toR - fromR) === Math.abs(toC - fromC);
+    const isOrthogonal = (fromR === toR || fromC === toC);
+    
+    if (isDiagonal) return true;
+    if (allowOrthogonalMoves && isOrthogonal) return true;
+    
+    return false;
+}
+
 // =========================================================
 // IA y Búsqueda de Movimientos (Incluye Reyes)
 // =========================================================
@@ -376,6 +395,17 @@ function getAllValidMovesForColor(color) {
     }
     return moves;
 }
+
+// Ejemplo para cuando cambie a modo MSN Messenger:
+function setMSNModeActive(isMSN) {
+    const checkbox = document.getElementById('allow-orthogonal');
+    if (checkbox) {
+        checkbox.checked = false;
+        checkbox.disabled = isMSN; // Queda congelado en reglas estrictas de MSN
+        allowOrthogonalMoves = false;
+    }
+}
+
 // Hooks Framework
 window.initCheckers = initCheckers;
 window.handleSquareClick = handleSquareClick;
