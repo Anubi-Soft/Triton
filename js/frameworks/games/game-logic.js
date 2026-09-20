@@ -11,14 +11,22 @@ function getPlayerName() {
 // Detección dinámica del juego actual según la URL
 function getCurrentGameName() {
     const path = window.location.pathname.toLowerCase();
+    
     if (path.includes("checkers") || path.includes("damas")) {
         return "Damas Retro";
     }
     if (path.includes("tateti")) {
         return "Ta-Te-Ti Retro";
     }
-    return "Juego Retro";
+    
+    // Por si no coincide la URL, nos fijamos en el título o un tag del HTML
+    const title = document.title.toLowerCase();
+    if (title.includes("damas")) return "Damas Retro";
+    if (title.includes("ta-te-ti") || title.includes("tateti")) return "Ta-Te-Ti Retro";
+
+    return "Ta-Te-Ti Retro";
 }
+
 
 // =========================================================
 // Envío de Mensajes y Procesamiento Dinámico
