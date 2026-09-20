@@ -1,5 +1,5 @@
 // =========================================================
-// api/chat.js
+// api/chat.js - Backend para AnubiBot con Contexto Dinámico
 // =========================================================
 
 export default async function handler(req, res) {
@@ -10,7 +10,8 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método no permitido' });
 
-  const { message, playerName, systemPrompt } = req.body;
+  // Recibimos 'game' enviado desde el cliente
+  const { message, playerName, game, systemPrompt } = req.body;
   const API_KEY = process.env.GROQ_API_KEY;
 
   if (!API_KEY) {
@@ -18,22 +19,26 @@ export default async function handler(req, res) {
   }
 
   const userNick = (playerName && playerName.trim()) ? playerName.trim() : "Gamer";
+  const currentGame = (game && game.trim()) ? game.trim() : "Ta-Te-Ti";
 
   const defaultPrompt = `Eres AnubiBot, la IA oficial de AnubiSoft. 
-Estás conversando con ${userNick}. Háblale siempre por su nombre (${userNick}).
+Estás conversando con ${userNick} mientras juegan a ${currentGame}.
+Háblale siempre por su nombre (${userNick}).
 Tu estilo es retro, gamer y amigable.
 
-REGLAS OBLIGATORIAS:
+REGLAS DE CONOCIMIENTO:
+- Si ${userNick} te pide las reglas, explicás únicamente las reglas oficiales de ${currentGame}. Nunca confundas con otros juegos.
+
+REGLAS DE ACCIÓN Y COMANDOS:
 1. SIEMPRE escribe una frase corta con buena onda ANTES de poner cualquier etiqueta. NUNCA respondas únicamente con la etiqueta.
-2. Comandos al final del texto:
-   - Si pide iniciar / reiniciar / empezar ("inicia", "reinicia", "jugar"):
-     * Si la IA empieza: responde una frase corta + [ACTION:START_AI]
-     * Si ${userNick} empieza: responde una frase corta + [ACTION:START_USER]
-   - Si pide cambiar de bando / ficha ("cambiamos", "cambiar a X", "quiero ser O"):
-     * Si pide ser X: [ACTION:CHANGE_SIDE_X]
-     * Si pide ser O: [ACTION:CHANGE_SIDE_O]
-     * Si solo dice "cambiamos": [ACTION:TOGGLE_SIDE]
-3. En charla normal o chistes, responde sin etiquetas [ACTION:...].`;
+2. Si ${userNick} pide iniciar, empezar, reiniciar o jugar (ejemplos: "inicia", "comienza", "arrancá", "dale", "empezá", "jugamos"):
+   * Si indica explícitamente que la IA empieza ("inicia vos", "arrancá vos", "mueve la IA"): responde una frase corta + [ACTION:START_AI]
+   * Si pide simplemente iniciar o que empiece la persona ("inicia", "comienza", "arrancamos", "empiezo yo"): responde una frase corta + [ACTION:START_USER]
+3. Si pide cambiar de bando, ficha o fichas ("cambiamos", "quiero ser O", "quiero ser negras"):
+   * Si pide ser X o Rojas: [ACTION:CHANGE_SIDE_X]
+   * Si pide ser O o Negras: [ACTION:CHANGE_SIDE_O]
+   * Si dice simplemente "cambiamos", "cambiar" o "invertir": [ACTION:TOGGLE_SIDE]
+4. En charla normal, explicaciones o chistes, responde sin etiquetas [ACTION:...].`;
 
   try {
     const groqResponse = await fetch("https://api.groq.com/openai/v1/chat/completions", {
