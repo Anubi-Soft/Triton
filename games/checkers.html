@@ -19,14 +19,13 @@
             <div id="mode-selector-container"></div>
 
             <p id="game-status" style="margin: 6px 0; font-weight: bold;">Turno de: Rojas</p>
-            
-            <!-- Checkbox de regla personalizada -->
-            <!-- Checkbox de regla personalizada estilizado -->
+          
+            <!-- Checkbox Neón Personalizado -->
 <div class="rules-option">
-    <label class="custom-checkbox-container" for="allow-orthogonal">
+    <label class="custom-checkbox" for="allow-orthogonal">
         <input type="checkbox" id="allow-orthogonal" onchange="toggleOrthogonalRules(this.checked)">
-        <span class="checkbox-mark"></span>
-        Habilitar mov. recto (Rey Arcade/Chinas)
+        <span class="checkbox-circle"></span>
+        <span>Habilitar mov. recto (Rey Arcade/Chinas)</span>
     </label>
 </div>
 
@@ -39,7 +38,7 @@
             </div>
             
             <button class="btn-reset" onclick="window.onStartUser ? window.onStartUser() : initCheckers()" style="padding: 4px 12px; margin-top: 5px;">Reiniciar Partida</button>
-        </div>
+        </>
 
         <!-- Columna Derecha: Chat con AnubiBot -->
         <div class="card compact-card">
