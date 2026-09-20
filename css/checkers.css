@@ -1,5 +1,5 @@
 /* =========================================================
-   css/checkers.css - Estilos y Modos Claro/Oscuro para Damas
+   css/checkers.css - Estilos, Animaciones, Neón y Custom UI
    ========================================================= */
 
 /* Layout Principal */
@@ -29,54 +29,6 @@
     justify-content: center;
     gap: 8px;
     margin: 10px auto;
-}
-
-/* Pilas laterales tipo Tragaperras / Casino */
-.captured-stack {
-    display: flex;
-    flex-direction: column-reverse;
-    align-items: center;
-    justify-content: flex-start;
-    width: 22px;
-    height: 280px;
-    background: var(--bg-color);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 4px 2px;
-    box-sizing: border-box;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-}
-
-/* Fichas individuales en la pila lateral */
-.captured-piece {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    border: 1px solid var(--text-color);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-    margin-bottom: -10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.55rem;
-    user-select: none;
-}
-
-.captured-piece.red { 
-    background: #ff4444; 
-    border-color: #ffffff;
-}
-
-.captured-piece.black { 
-    background: #222222; 
-    border-color: #888888;
-    color: #ffffff;
-}
-
-/* En tema claro, contrastamos las fichas negras */
-body.light-theme .captured-piece.black {
-    background: #1f2937;
-    border-color: #4b5563;
 }
 
 /* Tablero de Damas */
@@ -129,7 +81,8 @@ body.light-theme .square.light {
     font-size: 0.75rem;
     user-select: none;
     box-shadow: 0 2px 5px rgba(0,0,0,0.4);
-    transition: transform 0.15 ease, box-shadow 0.15s ease;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
 
 .piece-r { 
@@ -141,27 +94,185 @@ body.light-theme .square.light {
     border-color: #777777;
 }
 
+/* Hover en piezas del tablero */
+.piece:hover {
+    transform: scale(1.25);
+    z-index: 10;
+    box-shadow: 0 0 10px var(--color-brand-cyan, #00d4ff);
+}
+
 /* Selección activa de ficha */
 .piece.selected { 
     border-color: var(--color-brand-cyan, #00d4ff); 
-    box-shadow: 0 0 10px var(--color-brand-cyan, #00d4ff); 
-    transform: scale(1.1);
+    box-shadow: 0 0 12px var(--color-brand-cyan, #00d4ff); 
+    transform: scale(1.15);
 }
 
-/* Opciones de reglas */
+/* =========================================================
+   EFECTO LATIDO (PULSE) EN CORONAS Y REINAS
+   ========================================================= */
+
+@keyframes crownPulse {
+    0% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.8));
+    }
+    50% {
+        transform: scale(1.25);
+        filter: drop-shadow(0 0 8px rgba(255, 215, 0, 1));
+    }
+    100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.8));
+    }
+}
+
+/* Animación a la ficha Rey en el tablero */
+.piece.king {
+    animation: crownPulse 1.8s infinite ease-in-out;
+}
+
+
+/* =========================================================
+   CASCADAS LATERALES (REINAS DE ARRIBA -> ABAJO / PEONES ABAJO -> ARRIBA)
+   ========================================================= */
+
+.captured-stack {
+    display: flex;
+    flex-direction: column-reverse; /* Por defecto de abajo hacia arriba (Peones) */
+    align-items: center;
+    justify-content: flex-start;
+    width: 24px;
+    height: 280px;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 6px 2px;
+    box-sizing: border-box;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Fichas individuales comídas */
+.captured-piece {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1px solid var(--text-color);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    margin-bottom: -8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.55rem;
+    user-select: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, z-index 0.2s ease;
+}
+
+/* Hover en las fichas comidas para verlas inflar */
+.captured-piece:hover {
+    transform: scale(1.4);
+    z-index: 20;
+}
+
+.captured-piece.red { 
+    background: #ff4444; 
+    border-color: #ffffff;
+}
+
+.captured-piece.black { 
+    background: #222222; 
+    border-color: #888888;
+    color: #ffffff;
+}
+
+/* En tema claro, contrastamos las fichas negras */
+body.light-theme .captured-piece.black {
+    background: #1f2937;
+    border-color: #4b5563;
+}
+
+/* Latido neón en las coronas comidas */
+.captured-piece.king-captured {
+    animation: crownPulse 1.8s infinite ease-in-out;
+}
+
+
+/* =========================================================
+   CHECKBOX PERSONALIZADO (CIRCULAR CON NEÓN, CHECK AZUL Y X ROJA)
+   ========================================================= */
+
 .rules-option {
-    margin: 8px 0;
+    margin: 10px 0;
     font-size: 0.85rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
     color: var(--text-color);
 }
 
-.rules-option input[type="checkbox"] {
+.custom-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     cursor: pointer;
-    accent-color: var(--accent-color);
+    user-select: none;
+}
+
+/* Ocultar la casilla cuadrada fea por defecto */
+.custom-checkbox input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* El círculo exterior elegante */
+.checkbox-circle {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--color-brand-cyan, #00d4ff);
+    box-shadow: 0 0 6px rgba(0, 212, 255, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+}
+
+/* UNCHECKED: Muestra la X Roja con Neón Neón */
+.checkbox-circle::after {
+    content: '✕';
+    font-size: 11px;
+    font-weight: 900;
+    color: #ff3344;
+    text-shadow: 0 0 6px #ff0022;
+    transition: all 0.25s ease;
+}
+
+/* UNCHECKED en Modo Claro (Mantiene rojo fuerte legible) */
+body.light-theme .checkbox-circle::after {
+    color: #d32f2f;
+    text-shadow: none;
+}
+
+/* CHECKED: Muestra el Tic / Check Azul */
+.custom-checkbox input:checked + .checkbox-circle {
+    border-color: var(--color-brand-cyan, #00d4ff);
+    box-shadow: 0 0 10px var(--color-brand-cyan, #00d4ff);
+}
+
+.custom-checkbox input:checked + .checkbox-circle::after {
+    content: '✓';
+    color: var(--color-brand-cyan, #00d4ff);
+    text-shadow: 0 0 8px var(--color-brand-cyan, #00d4ff);
+}
+
+/* Hover sobre el checkbox completo */
+.custom-checkbox:hover .checkbox-circle {
+    transform: scale(1.12);
+    box-shadow: 0 0 10px var(--color-brand-cyan, #00d4ff);
 }
 
 /* Panel de Chat Interno */
