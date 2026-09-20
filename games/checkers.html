@@ -4,114 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Damas Retro</title>
+    <!-- CSS Global + CSS Específico del Juego -->
     <link rel="stylesheet" href="../css/styles.css">
-    <style>
-        body { background: transparent; padding: 5px; margin: 0; }
-        
-        .game-layout {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        @media (min-width: 768px) {
-            .game-layout { grid-template-columns: 1fr 1fr; align-items: start; }
-        }
-
-        /* Layout con laterales para fichas comidas */
-        .board-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin: 10px auto;
-        }
-
-        /* Pilas laterales tipo Tragaperras / Casino */
-        .captured-stack {
-            display: flex;
-            flex-direction: column-reverse;
-            align-items: center;
-            justify-content: flex-start;
-            width: 22px;
-            height: 280px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 4px 2px;
-            box-sizing: border-box;
-        }
-
-        .captured-piece {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            border: 1px solid #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            margin-bottom: -10px;
-        }
-        .captured-piece.red { background: #ff4444; }
-        .captured-piece.black { background: #333; border-color: #777; }
-
-        #checkers-board {
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            width: 280px;
-            height: 280px;
-            border: 2px solid var(--accent-color, #00ffcc);
-            border-radius: 4px;
-        }
-
-        .square { width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; }
-        .square.dark { background: rgba(0,0,0,0.5); }
-        .square.light { background: rgba(255,255,255,0.1); }
-
-        .piece { 
-            width: 26px; 
-            height: 26px; 
-            border-radius: 50%; 
-            border: 2px solid #fff; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            user-select: none;
-        }
-        .piece-r { background: #ff4444; }
-        .piece-b { background: #333; }
-        .piece.selected { border-color: #00ffcc; box-shadow: 0 0 8px #00ffcc; }
-
-        /* Estilo para la opción de reglas */
-        .rules-option {
-            margin: 8px 0;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            color: #ddd;
-        }
-        .rules-option input[type="checkbox"] {
-            cursor: pointer;
-            accent-color: var(--accent-color, #00ffcc);
-        }
-
-        @media (max-width: 768px) {
-            #checkers-board { width: 240px; height: 240px; }
-            .square { width: 30px; height: 30px; }
-            .piece { width: 22px; height: 22px; font-size: 0.65rem; }
-            .captured-stack { height: 240px; width: 18px; }
-            .captured-piece { width: 14px; height: 14px; margin-bottom: -8px; }
-        }
-    </style>
+    <link rel="stylesheet" href="../css/checkers.css">
 </head>
 <body>
 
     <div class="game-layout">
         <!-- Columna Izquierda: Juego y Selección de Modo -->
-        <div class="card compact-card text-center" style="padding: 12px;">
+        <div class="card compact-card text-center">
             <h2>Damas Retro 🔴⚪</h2>
             
             <!-- Contenedor donde se inyecta el selector universal -->
@@ -136,16 +37,16 @@
         </div>
 
         <!-- Columna Derecha: Chat con AnubiBot -->
-        <div class="card compact-card" style="padding: 12px;">
-            <h3 style="color: var(--accent-color, #00ffcc);">💬 Chat con AnubiBot</h3>
+        <div class="card compact-card">
+            <h3 style="color: var(--accent-color);">💬 Chat con AnubiBot</h3>
             
             <div style="margin: 5px 0; display: flex; align-items: center; gap: 6px;">
                 <label for="player-name" class="label-sm">Nick: </label>
                 <input type="text" id="player-name" class="select-style" style="width: 100%; text-align: left;" value="Jugador">
             </div>
 
-            <div id="chat-history" style="height: 140px; overflow-y: auto; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 8px; text-align: left; font-size: 0.85rem; margin-bottom: 8px;">
-                <div><strong style="color: #00A2ED;">AnubiBot:</strong> ¡Bienvenido a Damas! 🎲 Elegí el modo y arrancamos.</div>
+            <div id="chat-history" class="chat-history-box">
+                <div><strong style="color: var(--accent-color);">AnubiBot:</strong> ¡Bienvenido a Damas! 🎲 Elegí el modo y arrancamos.</div>
             </div>
 
             <div style="display: flex; gap: 6px;">
