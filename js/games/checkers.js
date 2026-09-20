@@ -95,7 +95,10 @@ function updateCapturedUI() {
         capturedRedPieces.forEach(pData => {
             const p = document.createElement('div');
             p.className = 'captured-piece red';
-            if (pData.isKing) p.innerText = '👑';
+            if (pData.isKing) {
+                p.innerText = '👑';
+                p.classList.add('king-captured'); // Activa el latido
+            }
             redStack.appendChild(p);
         });
     }
@@ -105,11 +108,15 @@ function updateCapturedUI() {
         capturedBlackPieces.forEach(pData => {
             const p = document.createElement('div');
             p.className = 'captured-piece black';
-            if (pData.isKing) p.innerText = '👑';
+            if (pData.isKing) {
+                p.innerText = '👑';
+                p.classList.add('king-captured'); // Activa el latido
+            }
             blackStack.appendChild(p);
         });
     }
 }
+
 
 function handleSquareClick(r, c) {
     if (!isGameActive) return;
