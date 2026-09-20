@@ -9,9 +9,9 @@ let aiColor = 'B';
 let userColor = 'R';   
 let isGameActive = true;
 
-// Contadores de fichas capturadas
-let capturedRedCount = 0;
-let capturedBlackCount = 0;
+// Listas de fichas capturadas (guarda si eran rey o peón)
+let capturedRedPieces = [];
+let capturedBlackPieces = [];
 
 // Variable global para habilitar/deshabilitar movimientos rectos (ortogonales)
 let allowOrthogonalMoves = false;
@@ -33,8 +33,8 @@ function initCheckers() {
     ];
     selectedPiece = null;
     isGameActive = true;
-    capturedRedCount = 0;
-    capturedBlackCount = 0;
+    capturedRedPieces = [];
+    capturedBlackPieces = [];
 
     turn = 'R'; 
     updateCheckersStatus();
@@ -85,27 +85,29 @@ function renderBoard() {
     }
 }
 
-// Renderiza las pilas laterales de fichas comidas
+// Renderiza las pilas laterales dibujando 👑 en las fichas reinas comidas
 function updateCapturedUI() {
     const redStack = document.getElementById('captured-red');
     const blackStack = document.getElementById('captured-black');
 
     if (redStack) {
         redStack.innerHTML = '';
-        for (let i = 0; i < capturedRedCount; i++) {
+        capturedRedPieces.forEach(pData => {
             const p = document.createElement('div');
             p.className = 'captured-piece red';
+            if (pData.isKing) p.innerText = '👑';
             redStack.appendChild(p);
-        }
+        });
     }
 
     if (blackStack) {
         blackStack.innerHTML = '';
-        for (let i = 0; i < capturedBlackCount; i++) {
+        capturedBlackPieces.forEach(pData => {
             const p = document.createElement('div');
             p.className = 'captured-piece black';
+            if (pData.isKing) p.innerText = '👑';
             blackStack.appendChild(p);
-        }
+        });
     }
 }
 
@@ -143,7 +145,7 @@ function executeMove(fromR, fromC, toR, toC) {
 
     let isCaptureMove = false;
 
-    // REGLA FUNDAMENTAL: El destino siempre debe ser un casillero oscuro (dark square)
+    // Destino en casillero oscuro
     if ((toR + toC) % 2 === 0) return false; 
 
     if (!isKing) {
@@ -163,8 +165,9 @@ function executeMove(fromR, fromC, toR, toC) {
             const midPiece = board[midR][midC];
 
             if (midPiece !== '' && midPiece.charAt(0) !== color) {
-                if (midPiece.charAt(0) === 'R') capturedRedCount++;
-                if (midPiece.charAt(0) === 'B') capturedBlackCount++;
+                const targetIsKing = midPiece.includes('K');
+                if (midPiece.charAt(0) === 'R') capturedRedPieces.push({ isKing: targetIsKing });
+                if (midPiece.charAt(0) === 'B') capturedBlackPieces.push({ isKing: targetIsKing });
 
                 board[toR][toC] = piece;
                 board[fromR][fromC] = '';
@@ -175,7 +178,7 @@ function executeMove(fromR, fromC, toR, toC) {
             }
         }
     } else {
-        // --- MOVIMIENTO DE REY (Diagonales + Rectos opcionales en casillas oscuras) ---
+        // --- MOVIMIENTO DE REY (Diagonales + Rectos opcionales) ---
         const isDiagonal = absRowDiff === colDiff;
         const isOrthogonal = (fromR === toR || fromC === toC);
 
@@ -194,7 +197,7 @@ function executeMove(fromR, fromC, toR, toC) {
             let p = board[r][c];
 
             if (p !== '') {
-                if (p.charAt(0) === color) return false; // Ficha propia bloquea
+                if (p.charAt(0) === color) return false; 
                 enemiesInPath++;
                 enemyR = r;
                 enemyC = c;
@@ -207,8 +210,10 @@ function executeMove(fromR, fromC, toR, toC) {
             return true;
         } else if (enemiesInPath === 1) {
             const midPiece = board[enemyR][enemyC];
-            if (midPiece.charAt(0) === 'R') capturedRedCount++;
-            if (midPiece.charAt(0) === 'B') capturedBlackCount++;
+            const targetIsKing = midPiece.includes('K');
+
+            if (midPiece.charAt(0) === 'R') capturedRedPieces.push({ isKing: targetIsKing });
+            if (midPiece.charAt(0) === 'B') capturedBlackPieces.push({ isKing: targetIsKing });
 
             board[toR][toC] = piece;
             board[fromR][fromC] = '';
@@ -231,7 +236,6 @@ function executeMove(fromR, fromC, toR, toC) {
     return false;
 }
 
-// Función auxiliar para detectar si hay más fichas para comer desde la nueva posición
 function checkMoreCapturesAvailable(r, c, color, isKing) {
     const directions = isKing 
         ? [{r:1,c:1}, {r:1,c:-1}, {r:-1,c:1}, {r:-1,c:-1}]
@@ -296,10 +300,6 @@ function checkAITurn() {
         setTimeout(makeAIMove, 600);
     }
 }
-
-// =========================================================
-// IA y Búsqueda de Movimientos
-// =========================================================
 
 function makeAIMove() {
     if (!isGameActive || turn !== aiColor) return;
