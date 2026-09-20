@@ -132,38 +132,81 @@ function executeMove(fromR, fromC, toR, toC) {
 
     const rowDiff = toR - fromR;
     const colDiff = Math.abs(toC - fromC);
-
-    // 1. Movimiento Simple Diagonal (1 casilla)
-    const validDirection = isKing || (color === 'R' && rowDiff === -1) || (color === 'B' && rowDiff === 1);
-    if (validDirection && colDiff === 1 && Math.abs(rowDiff) === 1) {
-        board[toR][toC] = piece;
-        board[fromR][fromC] = '';
-        checkKingCoronation(toR, toC);
-        return true;
-    }
-
-    // 2. Captura / "Comer" (2 casillas en diagonal)
-    const validJumpDirection = isKing || (color === 'R' && rowDiff === -2) || (color === 'B' && rowDiff === 2);
-    if (validJumpDirection && colDiff === 2 && Math.abs(rowDiff) === 2) {
-        const midR = (fromR + toR) / 2;
-        const midC = (fromC + toC) / 2;
-        const midPiece = board[midR][midC];
-
-        if (midPiece !== '' && midPiece.charAt(0) !== color) {
-            // Incrementar contador de fichas comidas
-            if (midPiece.charAt(0) === 'R') capturedRedCount++;
-            if (midPiece.charAt(0) === 'B') capturedBlackCount++;
-
+    
+    if (!isKing) {
+        // --- MOVIMIENTO DE PEÓN NORMAL ---
+        // 1. Movimiento Simple
+        const validDirection = (color === 'R' && rowDiff === -1) || (color === 'B' && rowDiff === 1);
+        if (validDirection && colDiff === 1 && Math.abs(rowDiff) === 1) {
             board[toR][toC] = piece;
             board[fromR][fromC] = '';
-            board[midR][midC] = ''; // Quitar la ficha
-            
             checkKingCoronation(toR, toC);
+            return true;
+        }
+
+        // 2. Captura (Comer)
+        const validJumpDirection = (color === 'R' && rowDiff === -2) || (color === 'B' && rowDiff === 2);
+        if (validJumpDirection && colDiff === 2 && Math.abs(rowDiff) === 2) {
+            const midR = (fromR + toR) / 2;
+            const midC = (fromC + toC) / 2;
+            const midPiece = board[midR][midC];
+
+            if (midPiece !== '' && midPiece.charAt(0) !== color) {
+                if (midPiece.charAt(0) === 'R') capturedRedCount++;
+                if (midPiece.charAt(0) === 'B') capturedBlackCount++;
+
+                board[toR][toC] = piece;
+                board[fromR][fromC] = '';
+                board[midR][midC] = '';
+                checkKingCoronation(toR, toC);
+                updateCapturedUI();
+                return true;
+            }
+        }
+    } else {
+        // --- MOVIMIENTO DE DAMA VOLADORA (REY) ---
+        if (colDiff !== Math.abs(rowDiff)) return false; // Solo diagonales
+        
+        const distance = Math.abs(rowDiff);
+        const dirR = Math.sign(toR - fromR);
+        const dirC = Math.sign(toC - fromC);
+        
+        let enemiesInPath = 0;
+        let enemyR = -1, enemyC = -1;
+        
+        // Recorrer la diagonal buscando obstáculos
+        for (let i = 1; i < distance; i++) {
+            let r = fromR + i * dirR;
+            let c = fromC + i * dirC;
+            let p = board[r][c];
+            
+            if (p !== '') {
+                if (p.charAt(0) === color) return false; // Choca con pieza propia
+                enemiesInPath++;
+                enemyR = r;
+                enemyC = c;
+            }
+        }
+        
+        // Si no hay enemigos en el medio, es un movimiento largo simple
+        if (enemiesInPath === 0) {
+            board[toR][toC] = piece;
+            board[fromR][fromC] = '';
+            return true;
+        } 
+        // Si hay exactamente 1 enemigo, lo come y aterriza más allá
+        else if (enemiesInPath === 1) {
+            const midPiece = board[enemyR][enemyC];
+            if (midPiece.charAt(0) === 'R') capturedRedCount++;
+            if (midPiece.charAt(0) === 'B') capturedBlackCount++;
+            
+            board[toR][toC] = piece;
+            board[fromR][fromC] = '';
+            board[enemyR][enemyC] = ''; // Elimina la ficha comida
             updateCapturedUI();
             return true;
         }
     }
-
     return false;
 }
 
@@ -216,38 +259,63 @@ function makeAIMove() {
     }
 }
 
+
 function getAllValidMovesForColor(color) {
     const moves = [];
 
     for (let r = 0; r < 8; r++) {
         for (let c = 0; c < 8; c++) {
             const piece = board[r][c];
-            // CORRECCIÓN CLAVE: Verificar la letra inicial para incluir 'R', 'RK', 'B', 'BK'
             if (piece !== '' && piece.charAt(0) === color) {
                 const isKing = piece.includes('K');
                 
-                const directions = [];
-                if (isKing || color === 'B') directions.push({ r: 1, c: -1 }, { r: 1, c: 1 });
-                if (isKing || color === 'R') directions.push({ r: -1, c: -1 }, { r: -1, c: 1 });
+                if (!isKing) {
+                    // --- REGLAS IA PARA PEÓN NORMAL ---
+                    const directions = [];
+                    if (color === 'B') directions.push({ r: 1, c: -1 }, { r: 1, c: 1 });
+                    if (color === 'R') directions.push({ r: -1, c: -1 }, { r: -1, c: 1 });
 
-                for (let dir of directions) {
-                    // Movimiento Simple
-                    const nr = r + dir.r;
-                    const nc = c + dir.c;
-                    if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && board[nr][nc] === '') {
-                        moves.push({ fromR: r, fromC: c, toR: nr, toC: nc, isCapture: false });
+                    for (let dir of directions) {
+                        // Movimiento Simple
+                        let nr = r + dir.r, nc = c + dir.c;
+                        if (nr >= 0 && nr < 8 && nc >= 0 && nc < 8 && board[nr][nc] === '') {
+                            moves.push({ fromR: r, fromC: c, toR: nr, toC: nc, isCapture: false });
+                        }
+                        // Captura
+                        let capR = r + dir.r * 2, capC = c + dir.c * 2;
+                        if (capR >= 0 && capR < 8 && capC >= 0 && capC < 8) {
+                            let midPiece = board[nr][nc];
+                            if (board[capR][capC] === '' && midPiece !== '' && midPiece.charAt(0) !== color) {
+                                moves.push({ fromR: r, fromC: c, toR: capR, toC: capC, isCapture: true });
+                            }
+                        }
                     }
-
-                    // Captura
-                    const capR = r + (dir.r * 2);
-                    const capC = c + (dir.c * 2);
-                    const midR = r + dir.r;
-                    const midC = c + dir.c;
-
-                    if (capR >= 0 && capR < 8 && capC >= 0 && capC < 8) {
-                        const midPiece = board[midR][midC];
-                        if (board[capR][capC] === '' && midPiece !== '' && midPiece.charAt(0) !== color) {
-                            moves.push({ fromR: r, fromC: c, toR: capR, toC: capC, isCapture: true });
+                } else {
+                    // --- REGLAS IA PARA DAMA VOLADORA (REY) ---
+                    const directions = [{r:1,c:1}, {r:1,c:-1}, {r:-1,c:1}, {r:-1,c:-1}];
+                    
+                    for (let dir of directions) {
+                        let enemyFound = false;
+                        
+                        // Escanear la diagonal completa (hasta 7 casilleros)
+                        for (let i = 1; i < 8; i++) {
+                            let nr = r + dir.r * i;
+                            let nc = c + dir.c * i;
+                            
+                            // Si sale del tablero, frenar en esta dirección
+                            if (nr < 0 || nr >= 8 || nc < 0 || nc >= 8) break;
+                            
+                            let target = board[nr][nc];
+                            
+                            if (target === '') {
+                                // Casillero vacío: puede moverse o aterrizar tras comer
+                                moves.push({ fromR: r, fromC: c, toR: nr, toC: nc, isCapture: enemyFound });
+                            } else if (target.charAt(0) === color) {
+                                break; // Topó con una pieza aliada, fin de esta diagonal
+                            } else {
+                                if (enemyFound) break; // Ya encontró un enemigo antes, no puede saltar dos seguidos
+                                enemyFound = true;     // Encontró un enemigo para comer
+                            }
                         }
                     }
                 }
@@ -256,7 +324,6 @@ function getAllValidMovesForColor(color) {
     }
     return moves;
 }
-
 // Hooks Framework
 window.initCheckers = initCheckers;
 window.handleSquareClick = handleSquareClick;
