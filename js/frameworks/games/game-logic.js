@@ -1,11 +1,23 @@
 // =========================================================
-// js/game-logic.js - Gestión del Chat, UI Universal y Feedback
+// js/frameworks/games/game-logic.js - Chat Universal y Feedback
 // =========================================================
 
 function getPlayerName() {
     const nameInput = document.getElementById("player-name");
     const val = nameInput ? nameInput.value.trim() : "";
     return val !== "" ? val : "Jugador";
+}
+
+// Detección dinámica del juego actual según la URL
+function getCurrentGameName() {
+    const path = window.location.pathname.toLowerCase();
+    if (path.includes("checkers") || path.includes("damas")) {
+        return "Damas Retro";
+    }
+    if (path.includes("tateti")) {
+        return "Ta-Te-Ti Retro";
+    }
+    return "Juego Retro";
 }
 
 // =========================================================
@@ -22,11 +34,18 @@ async function sendMessage() {
     appendChatMessage(playerName, text);
     input.value = "";
 
+    // Obtenemos el juego actual para que la IA sepa el contexto
+    const currentGame = getCurrentGameName();
+
     try {
         const res = await fetch("https://triton-bxoj.vercel.app/api/chat", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: text, playerName: playerName })
+            body: JSON.stringify({ 
+                message: text, 
+                playerName: playerName,
+                game: currentGame // Send context to Vercel backend
+            })
         });
 
         if (!res.ok) {
@@ -40,13 +59,13 @@ async function sendMessage() {
         // Capturar todas las etiquetas [ACTION:...]
         const actionMatch = reply.match(/\[ACTION:([A-Z_]+)\]/i);
         
-        // Limpiar las etiquetas para que el usuario solo lea el diálogo
+        // Limpiar las etiquetas para mostrar únicamente el texto
         let cleanReply = reply.replace(/\[ACTION:[^\]]+\]/gi, "").trim();
         if (!cleanReply) cleanReply = "¡A jugar!";
 
         appendChatMessage("AnubiBot", cleanReply);
 
-        // Si la IA devolvió una acción, la derivamos a nuestro Framework (DLL)
+        // Derivar la acción recibida a nuestro Framework (GameActions)
         if (actionMatch && window.GameActions) {
             const actionTag = actionMatch[1].toUpperCase();
             window.GameActions.processAction(actionTag);
@@ -57,7 +76,7 @@ async function sendMessage() {
     }
 }
 
-// Cambia la UI al modo vs IA
+// Cambia la UI al modo vs IA automáticamente
 function switchToPVE() {
     const modeElem = document.getElementById("game-mode");
     if (modeElem && modeElem.value !== "pve") {
@@ -95,6 +114,12 @@ function scrollToBottom() {
         history.scrollTop = history.scrollHeight;
     }
 }
+
+// Exposición Global de funciones principales
+window.sendMessage = sendMessage;
+window.appendChatMessage = appendChatMessage;
+window.getPlayerName = getPlayerName;
+window.switchToPVE = switchToPVE;
 
 // =========================================================
 // UX: Salto con Enter y Enfoque en Pantallas Móviles
