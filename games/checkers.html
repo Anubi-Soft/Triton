@@ -50,7 +50,7 @@
             border-radius: 50%;
             border: 1px solid #fff;
             box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            margin-bottom: -10px; /* Efecto encimado */
+            margin-bottom: -10px;
         }
         .captured-piece.red { background: #ff4444; }
         .captured-piece.black { background: #333; border-color: #777; }
@@ -83,6 +83,21 @@
         .piece-b { background: #333; }
         .piece.selected { border-color: #00ffcc; box-shadow: 0 0 8px #00ffcc; }
 
+        /* Estilo para la opción de reglas */
+        .rules-option {
+            margin: 8px 0;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            color: #ddd;
+        }
+        .rules-option input[type="checkbox"] {
+            cursor: pointer;
+            accent-color: var(--accent-color, #00ffcc);
+        }
+
         @media (max-width: 768px) {
             #checkers-board { width: 240px; height: 240px; }
             .square { width: 30px; height: 30px; }
@@ -104,6 +119,12 @@
 
             <p id="game-status" style="margin: 6px 0; font-weight: bold;">Turno de: Rojas</p>
             
+            <!-- Checkbox de regla personalizada -->
+            <div class="rules-option">
+                <input type="checkbox" id="allow-orthogonal" onchange="toggleOrthogonalRules(this.checked)">
+                <label for="allow-orthogonal">Habilitar mov. recto (Rey Arcade/Chinas)</label>
+            </div>
+
             <!-- Contenedor con pilas de fichas comidas a los laterales -->
             <div class="board-container">
                 <div id="captured-red" class="captured-stack" title="Rojas comidas"></div>
@@ -111,7 +132,7 @@
                 <div id="captured-black" class="captured-stack" title="Negras comidas"></div>
             </div>
             
-            <button class="btn-reset" onclick="initCheckers()" style="padding: 4px 12px; margin-top: 5px;">Reiniciar Partida</button>
+            <button class="btn-reset" onclick="window.onStartUser ? window.onStartUser() : initCheckers()" style="padding: 4px 12px; margin-top: 5px;">Reiniciar Partida</button>
         </div>
 
         <!-- Columna Derecha: Chat con AnubiBot -->
@@ -141,7 +162,6 @@
     <script src="../js/games/checkers.js"></script>
   
     <script>
-        // Inyectar el selector al cargar
         document.addEventListener("DOMContentLoaded", () => {
             if (window.GameModeManager) {
                 GameModeManager.renderSelector('mode-selector-container');
