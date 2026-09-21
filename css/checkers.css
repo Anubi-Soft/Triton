@@ -315,3 +315,36 @@ body.light-theme .checkbox-circle::after {
         font-size: 0.45rem;
     }
 }
+
+/* =========================================================
+   Sincronización Glass para Tablero, Chat e Inputs
+   ========================================================= */
+
+/* Caja del Chat translúcida estilo Cristal */
+.chat-history-box {
+    background: rgba(0, 0, 0, 0.2) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border) !important;
+}
+
+body.light-theme .chat-history-box {
+    background: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Inputs de texto y selectores Glass */
+.select-style, 
+#player-name, 
+#chat-input {
+    background: rgba(255, 255, 255, 0.15) !important;
+    backdrop-filter: blur(6px);
+    border: 1px solid var(--glass-border) !important;
+    color: var(--text-color) !important;
+}
+
+body.light-theme .select-style,
+body.light-theme #player-name,
+body.light-theme #chat-input {
+    background: rgba(255, 255, 255, 0.6) !important;
+}
+
