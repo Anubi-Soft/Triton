@@ -4,24 +4,40 @@
     <div class="games-grid">
         
         <!-- Tarjeta 1: Ta-Te-Ti -->
-        <button id="btn-tateti" class="game-card" data-game-url="games/tateti.html" onclick="window.launchGame('games/tateti.html')">
-            <div class="game-icon">❌⭕</div>
-            <span>Ta-Te-Ti AI</span>
-        </button>
+        <button id="btn-tateti" class="game-card" onclick="window.launchGame('games/tateti.html', 'Ta-Te-Ti AI')">
+    <div class="game-icon">❌⭕</div>
+    <span>Ta-Te-Ti AI</span>
+</button>
 
-        <!-- Tarjeta 2: Damas Retro -->
-        <button id="btn-checkers" class="game-card" data-game-url="games/checkers.html" onclick="window.launchGame('games/checkers.html')">
-            <div class="game-icon">⚪🔴</div>
-            <span>Damas Retro</span>
-        </button>
+<button id="btn-checkers" class="game-card" onclick="window.launchGame('games/checkers.html', 'Damas Retro')">
+    <div class="game-icon">⚪🔴</div>
+    <span>Damas Retro</span>
+</button>
+
 
     </div>
 </div>
 
-
 <div class="game-viewport">
-    <button id="btn-back" class="btn-retro-back hidden" type="button">
-        ⬅️ Volver al Menú
-    </button>
+    <!-- Barra estilo Windows 7 Explorer (Oculta por defecto hasta abrir un juego) -->
+    <div id="win7-explorer-bar" class="win7-explorer-bar hidden">
+        <!-- Botón Esférico 3D (Reemplaza al btn-retro-back) -->
+        <button id="btn-back" class="win7-circle-btn" type="button" title="Volver al Menú">
+            <span class="arrow">❮</span>
+        </button>
+
+        <!-- Barra de Direcciones Transparente -->
+        <div class="win7-address-bar">
+            <div class="address-path">
+                <span class="address-icon">🎮</span>
+                <span class="address-text">Galería de Minijuegos</span>
+                <span class="address-separator">►</span>
+                <span id="current-game-title" class="address-text" style="color: var(--accent-color);">Juego</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Iframe del Juego -->
     <iframe id="game-frame" class="game-frame hidden" src="about:blank"></iframe>
 </div>
+
