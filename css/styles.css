@@ -16,16 +16,21 @@
 }
 
 /* =========================================================
-   2. VARIABLES Y TEMAS (DARK / LIGHT)
+   2. VARIABLES Y TEMAS (DARK / AERO GLASS LIGHT)
    ========================================================= */
 :root {
   --color-brand-blue: #0088ff;
   --color-brand-cyan: #00d4ff;
   --color-brand-orange: #ff7700;
 
+  /* MODO OSCURO (Obsidian + Glass) */
   --bg-color: #0d1117;
-  --sidebar-bg: #161b22;
-  --card-bg: #1f242d;
+  --sidebar-bg: rgba(22, 27, 34, 0.85);
+  --card-bg: rgba(31, 36, 45, 0.65);
+  --glass-bg: rgba(22, 27, 34, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+
   --text-color: #f0f6fc;
   --text-muted: #8b949e;
   --accent-color: #0088ff;
@@ -34,14 +39,19 @@
 }
 
 body.light-theme {
-  --bg-color: #f3f4f6;
-  --sidebar-bg: #eaedee;
-  --card-bg: #ffffff;
-  --text-color: #1f2937;
-  --text-muted: #6b7280;
-  --accent-color: #0066cc;
-  --border-color: #d1d5db;
-  --shadow-color: rgba(0, 102, 204, 0.12);
+  /* MODO CLARO (Celeste Sólido Windows 7 Home Basic + Aero Glass) */
+  --bg-color: #cbdcf7;                  /* Celeste clásico Win7 */
+  --sidebar-bg: rgba(220, 232, 248, 0.85);
+  --card-bg: rgba(255, 255, 255, 0.45); /* Cristal translúcido blanco */
+  --glass-bg: rgba(255, 255, 255, 0.45);
+  --glass-border: rgba(255, 255, 255, 0.7); /* Borde de luz Aero */
+  --glass-shadow: 0 8px 32px 0 rgba(0, 102, 204, 0.18);
+
+  --text-color: #0f172a;
+  --text-muted: #475569;
+  --accent-color: #0066cc;               /* Azul Aero */
+  --border-color: #a0c0e0;
+  --shadow-color: rgba(0, 102, 204, 0.15);
 }
 
 /* =========================================================
@@ -55,7 +65,7 @@ body.light-theme {
 
 body {
   font-family: "Segoe UI Variable Text", "Segoe UI", -apple-system, sans-serif;
-  background-color: var(--bg-color);
+  background-color: var(--bg-color) !important;
   color: var(--text-color);
   min-height: 100vh;
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -157,12 +167,14 @@ body {
 }
 
 /* =========================================================
-   5. SIDEBAR (NAVEGACIÓN)
+   5. SIDEBAR (NAVEGACIÓN AERO GLASS)
    ========================================================= */
 .sidebar {
   width: 70px;
   background-color: var(--sidebar-bg);
-  border-right: 1px solid var(--border-color);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border-right: 1px solid var(--glass-border);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -190,11 +202,11 @@ body {
 }
 
 .nav-item:hover {
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: rgba(255, 255, 255, 0.15);
 }
 
 .nav-item.active {
-  background-color: rgba(0, 136, 255, 0.18);
+  background-color: rgba(0, 136, 255, 0.22);
   color: var(--accent-color);
 }
 
@@ -220,7 +232,7 @@ body {
 }
 
 /* =========================================================
-   6. CONTENIDO Y TARJETAS
+   6. CONTENIDO Y TARJETAS (EFECTO AERO GLASS)
    ========================================================= */
 .main-content {
   flex: 1;
@@ -244,13 +256,17 @@ body {
   display: block;
 }
 
+/* Tarjetas y módulos con degradado esmerilado Aero Glass */
 .card {
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
+  background: var(--glass-bg) !important;
+  backdrop-filter: blur(12px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(160%) !important;
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: var(--glass-shadow) !important;
+  border-radius: 12px;
   padding: 20px;
   margin-bottom: 20px;
-  box-shadow: 0 2px 8px var(--shadow-color);
+  color: var(--text-color);
 }
 
 .badge {
@@ -285,9 +301,14 @@ body {
 .select-style {
   padding: 6px;
   border-radius: 6px;
-  background: var(--bg-color);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(6px);
   color: var(--text-color);
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--glass-border);
+}
+
+body.light-theme .select-style {
+  background: rgba(255, 255, 255, 0.6);
 }
 
 .board {
@@ -301,15 +322,20 @@ body {
 .cell {
   width: 80px;
   height: 80px;
-  background-color: var(--bg-color);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
   font-size: 2rem;
   font-weight: bold;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+
+body.light-theme .cell {
+  background-color: rgba(255, 255, 255, 0.5);
 }
 
 .cell.x { color: #e74c3c; }
@@ -340,13 +366,18 @@ body {
 
 .chat-box {
   height: 100px;
-  background: var(--bg-color);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
   padding: 8px;
   margin: 8px 0;
   overflow-y: auto;
   font-size: 0.85rem;
+}
+
+body.light-theme .chat-box {
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .chat-welcome {
@@ -363,11 +394,16 @@ body {
   flex: 1;
   padding: 8px;
   border-radius: 6px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-color);
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(6px);
   color: var(--text-color);
   font-size: 0.85rem;
   outline: none;
+}
+
+body.light-theme .chat-input {
+  background: rgba(255, 255, 255, 0.6);
 }
 
 .btn-send {
@@ -389,52 +425,50 @@ body {
 /* =========================================================
    8. ADAPTACIÓN MÓVIL (ZÓCALO INFERIOR)
    ========================================================= */
-/* Reducimos espacios para pantallas móviles */
 @media (max-width: 768px) {
     .game-frame {
         height: calc(100vh - 120px);
         min-height: 600px;
     }
+
+    .main-content {
+      padding-bottom: 80px !important;
+    }
+
+    .sidebar {
+      position: fixed !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      top: auto !important;
+      width: 100% !important;
+      height: 60px !important;
+      flex-direction: row !important;
+      justify-content: space-around !important;
+      padding-top: 0 !important;
+      border-right: none !important;
+      border-top: 1px solid var(--glass-border) !important;
+      background-color: var(--sidebar-bg) !important;
+      z-index: 1000 !important;
+    }
+
+    .nav-item-bottom {
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+    }
+
+    .nav-item.active::before {
+      left: auto !important;
+      bottom: 0 !important;
+      top: auto !important;
+      width: 24px !important;
+      height: 4px !important;
+      border-radius: 4px 4px 0 0 !important;
+    }
 }
 
-  .main-content {
-    padding-bottom: 80px !important;
-  }
-
-  .sidebar {
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    top: auto !important;
-    width: 100% !important;
-    height: 60px !important;
-    flex-direction: row !important;
-    justify-content: space-around !important;
-    padding-top: 0 !important;
-    border-right: none !important;
-    border-top: 1px solid var(--border-color) !important;
-    background-color: var(--sidebar-bg) !important;
-    z-index: 1000 !important;
-  }
-
-  .nav-item-bottom {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-  }
-
-  .nav-item.active::before {
-    left: auto !important;
-    bottom: 0 !important;
-    top: auto !important;
-    width: 24px !important;
-    height: 4px !important;
-    border-radius: 4px 4px 0 0 !important;
-  }
-
 /* =========================================================
-   9. ESCRITORIO Y CAJÓN DE JUEGOS (GAMES HUB)
+   9. ESCRITORIO Y CAJÓN DE JUEGOS (GAMES HUB AERO GLASS)
    ========================================================= */
-/* El contenedor principal debe ser relativo */
 .main-workspace {
   position: relative;
   width: 100%;
@@ -446,41 +480,63 @@ body {
     flex-direction: column;
 }
 
-.btn-retro-back {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 10;
-  background-color: var(--accent-color);
-  color: #fff;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
+/* BOTÓN VOLVER ESTILO WINDOWS 7 AERO CON DEGRADADO METÁLICO */
+.btn-win7-back, .btn-retro-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
   font-weight: bold;
-  font-size: 0.8rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  color: #ffffff !important;
+  background: linear-gradient(180deg, #4ea3ff 0%, #0066cc 50%, #004499 100%);
+  border: 1px solid #002d72;
+  border-radius: 15px;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.7), 0 2px 6px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  z-index: 10;
 }
 
-/* El Cajón de Juegos cubre toda la pantalla del módulo (incluyendo el chat) */
+.btn-win7-back:hover, .btn-retro-back:hover {
+  background: linear-gradient(180deg, #66b2ff 0%, #1a75ff 50%, #0055cc 100%);
+  box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.9), 0 0 10px rgba(0, 102, 204, 0.7);
+  transform: translateY(-1px);
+}
+
+.btn-win7-back .arrow-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  font-size: 11px;
+}
+
+/* El Cajón de Juegos cubre la pantalla flotando sobre el celeste Aero */
 .app-drawer {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  min-height: 520px; /* Altura suficiente para tapar tablero + chat */
-  background-color: var(--card-bg);
+  min-height: 520px;
+  background: var(--glass-bg) !important;
+  backdrop-filter: blur(14px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(160%) !important;
   padding: 20px;
-  z-index: 50; /* Z-Index alto para quedar por encima del chat */
+  z-index: 50;
   display: flex;
   flex-direction: column;
   align-items: center;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  box-shadow: 0 4px 15px var(--shadow-color);
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
-
 
 .drawer-title {
   font-size: 1.1rem;
@@ -496,18 +552,24 @@ body {
 }
 
 .game-card {
-  background-color: var(--bg-color);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
   padding: 15px 10px;
   text-align: center;
   cursor: pointer;
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.light-theme .game-card {
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .game-card:hover {
   transform: translateY(-3px);
   border-color: var(--accent-color);
+  box-shadow: 0 0 12px var(--shadow-color);
 }
 
 .game-card.locked {
@@ -522,7 +584,6 @@ body {
 
 .game-frame {
     width: 100%;
-    /* Alto adaptable en escritorio */
     height: 80vh; 
     min-height: 720px;
     border: none;
